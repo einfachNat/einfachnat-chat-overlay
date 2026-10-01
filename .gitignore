@@ -1,0 +1,22 @@
+# Windows
+Thumbs.db
+desktop.ini
+
+# macOS
+.DS_Store
+
+# Editor / lokale Einstellungen
+.vscode/
+
+# Temporäre Dateien
+*.tmp
+*.temp
+*.bak
+*.log
+
+# Lokale Archive
+*.zip
+
+# Sicherungen
+backup/
+Backup/

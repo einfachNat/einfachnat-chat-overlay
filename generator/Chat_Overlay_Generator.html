@@ -1,0 +1,3240 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="generator" content="einfachNat Chat Overlay Generator 1.1.1">
+    <!-- Interne Arbeitsvariante B -->
+    <meta name="author" content="einfachNat">
+    <title>einfachNat Chat Overlay Generator 1.1.1</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --prev-name-col: #ffffff;
+            --prev-text-col: #ffffff;
+            --prev-bub-col: #2d1446;
+        }
+        
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: transparent;
+            color: #ffffff;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            background-color: rgba(45, 20, 70, 0.9);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 1000px;
+            width: 100%;
+            border: 1px solid rgba(255,255,255,0);
+            position: relative;
+        }
+        
+        /* HEADER BEREICH MIT ANIMIERTER VORSCHAU */
+        .header-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; gap: 30px; flex-wrap: wrap; }
+        .header-text { flex: 1; min-width: 300px; }
+        .header-text h1 { 
+            color: #b985f5; margin-top: 0; margin-bottom: 10px; text-align: left; 
+            display: flex; align-items: center; gap: 15px; flex-wrap: wrap;
+        }
+        .header-text p.subtitle { color: #aaaaaa; margin-bottom: 0; text-align: left; line-height: 1.5; }
+        
+        .version-badge {
+            background: #b985f5; color: #12091c; padding: 4px 10px;
+            border-radius: 15px; font-size: 14px; font-weight: bold;
+        }
+
+        .header-preview-wrapper { display: flex; flex-direction: column; width: 560px; flex-shrink: 0; background: rgba(0,0,0,0.3); border-radius: 10px; border-left: none; overflow: hidden; }
+        .header-preview {
+            display: flex; flex-direction: column; justify-content: flex-end; gap: 0; height: 130px; 
+            padding: 1px; overflow: hidden;
+            -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 100%);
+            mask-image: linear-gradient(to bottom, transparent 0%, black 15%, black 100%);
+        }
+        
+        @keyframes slideInPreview {
+            from { opacity: 0; transform: translateX(30px) scale(0.9); max-height: 0; margin-bottom: 0; }
+            to { opacity: 1; transform: translateX(0) scale(1); max-height: 200px; margin-bottom: 12px; }
+        }
+        @keyframes fadeOutPreview {
+            from { opacity: 1; transform: translateX(0) scale(1); max-height: 200px; margin-bottom: 12px; }
+            to { opacity: 0; transform: translateX(-20px) scale(0.9); max-height: 0; margin-bottom: 0; padding: 0; border: 0; }
+        }
+
+        .hp-msg { 
+            display: flex; justify-content: flex-end; align-items: flex-start; 
+            margin-bottom: 0; 
+            animation: slideInPreview 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; 
+            overflow: visible; 
+            transform-origin: right bottom;
+        }
+        .hp-msg.fade-out {
+            animation: fadeOutPreview 0.5s ease-out forwards;
+        }
+
+        .hp-content { display: flex; flex-direction: column; align-items: flex-end; margin-right: 10px; max-width: 85%; }
+        .hp-name { font-size: 14px; font-weight: 500; margin-bottom: 3px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); color: var(--prev-name-col); }
+        .hp-bubble { 
+            background: var(--prev-bub-col); color: var(--prev-text-col); 
+            padding: 8px 14px; border-radius: 15px 0 15px 15px; font-size: 15px; 
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3); line-height: 1.3; 
+            word-wrap: break-word; word-break: break-word;
+        }
+        .hp-avatar { width: 40px; height: 40px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); background-size: cover; background-position: center; flex-shrink: 0; }
+        
+        .preview-input-area { display: flex; padding: 10px; background: rgba(0,0,0,0.5); gap: 10px; }
+        .preview-input-area input { margin: 0; padding: 8px 12px; font-size: 14px; }
+        .preview-input-area button { margin: 0; width: auto; padding: 8px 15px; font-size: 14px; white-space: nowrap; }
+
+        /* SECTIONS */
+        .section {
+            background: rgba(0,0,0,0.9);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #b985f5;
+        }
+        .section h2 { margin-top: 0; font-size: 20px; color: #e0c8ff; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+        .section-desc { font-size: 14px; color: #bbb; margin-bottom: 20px; line-height: 1.5; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 500; }
+        input[type="text"], input[type="number"], select, textarea {
+            width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #5a3885;
+            background: #1a0f2b; color: white; font-family: 'Kanit', sans-serif; box-sizing: border-box;
+        }
+        input[type="text"]:focus, input[type="number"]:focus, select:focus, textarea:focus { outline: none; border-color: #b985f5; }
+        
+        .color-picker-group { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        input[type="color"] {
+            -webkit-appearance: none; border: none; width: 40px; height: 40px;
+            border-radius: 5px; cursor: pointer; padding: 0; background: none;
+        }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: 2px solid #5a3885; border-radius: 5px; }
+        
+        .checkbox-group { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+        input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; flex-shrink: 0; }
+        
+        .license-group {
+            background: rgba(0,0,0,0.4); 
+            padding: 20px; 
+            border-radius: 8px; 
+            border-left: 4px solid #b985f5;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            align-items: flex-start;
+        }
+        .license-group label {
+            font-size: 14px; line-height: 1.5; color: #ccc; cursor: pointer; margin-bottom: 0;
+        }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        button {
+            width: 100%; padding: 15px; font-size: 18px; font-weight: bold; color: white;
+            background: linear-gradient(45deg, #7b2cbf, #b985f5); border: none; border-radius: 8px;
+            cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; font-family: 'Kanit', sans-serif;
+        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 20px rgba(185, 133, 245, 0.4); }
+        .btn-small {
+            width: auto; padding: 8px 12px; font-size: 14px; margin-top: 0; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3);
+        }
+        .btn-small:hover { background: rgba(255,255,255,0.2); box-shadow: none; transform: none; }
+        .note { font-size: 12px; color: #888; margin-top: 5px; }
+        .license-text { text-align: center; font-size: 12px; color: #666; margin-top: 15px; }
+
+        .preview-avatar-container { position: relative; width: 75px; height: 75px; margin: 0 auto; }
+        .preview-avatar { width: 70px; height: 70px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.2); background-color: #444; }
+
+        .preset-note {
+            margin-top: 14px; display: inline-block; padding: 7px 11px; border-radius: 999px;
+            background: rgba(185,133,245,.12); border: 1px solid rgba(185,133,245,.28);
+            color: #d9c2f7; font-size: 13px;
+        }
+        .new-badge {
+            display:inline-block; vertical-align:middle; margin-left:8px; padding:3px 8px;
+            border-radius:999px; background:#b985f5; color:#12091c; font-size:11px; font-weight:700;
+        }
+        .preview-action-row {
+            display:flex; gap:8px; padding:0 10px 10px; background:rgba(0,0,0,.5); flex-wrap:wrap;
+        }
+        .preview-action-row .btn-small { flex:1; min-width:105px; }
+        .feature-card {
+            background:rgba(123,44,191,.10); border:1px solid rgba(185,133,245,.18);
+            border-radius:9px; padding:16px; margin-bottom:14px;
+        }
+        input[type="range"] { width:100%; accent-color:#b985f5; cursor:pointer; }
+        .advanced-section summary {
+            cursor:pointer; font-size:20px; font-weight:700; color:#e0c8ff; user-select:none;
+        }
+        .advanced-content { margin-top:18px; }
+        .feedback-box {
+            background:rgba(68,12,112,.28); border:1px solid rgba(185,133,245,.28);
+            border-left:4px solid #b985f5; border-radius:10px; padding:18px; margin:24px 0 10px; color:#ddd;
+        }
+        .feedback-box p { margin:8px 0 12px; line-height:1.5; }
+        .download-button { margin-top:8px; }
+        @media (max-width:760px) {
+            body { padding:15px 8px; }
+            .container { padding:22px 14px; }
+            .header-preview-wrapper { width:100%; }
+            .grid-2 { grid-template-columns:1fr; }
+        }
+
+    
+/* ==========================================
+   TEXTE FÜR KANALPUNKTE & ZUSCHAUERSERIEN
+   ========================================== */
+.text-editor-section { overflow: visible; }
+.text-editor-intro { color:#ccc; line-height:1.55; margin-bottom:16px; }
+.placeholder-help {
+    background:rgba(185,133,245,.08); border:1px solid rgba(185,133,245,.24);
+    border-radius:9px; padding:14px 16px; margin:14px 0 20px;
+}
+.placeholder-help strong { color:#e0c8ff; }
+.placeholder-help p { margin:6px 0 10px; color:#bbb; }
+.placeholder-grid { display:flex; flex-wrap:wrap; gap:7px; }
+.placeholder-chip {
+    display:inline-flex; gap:5px; align-items:center; padding:5px 8px; border-radius:7px;
+    background:#1a0f2b; border:1px solid #5a3885; font-size:12px; color:#ddd;
+}
+.placeholder-chip code { color:#e0c8ff; font-family:Consolas, monospace; font-weight:700; }
+.text-editor-category {
+    margin:18px 0; padding:16px; background:rgba(0,0,0,.26);
+    border:1px solid rgba(185,133,245,.20); border-radius:10px;
+}
+.text-editor-category h3 { margin:0 0 5px; color:#e0c8ff; font-size:18px; }
+.text-editor-category > p { margin:0 0 14px; color:#aaa; line-height:1.5; font-size:13px; }
+#text-editors details {
+    margin:10px 0; padding:0; border:1px solid #685079; border-radius:8px;
+    background:rgba(10,5,15,.5); overflow:hidden;
+}
+#text-editors summary {
+    cursor:pointer; font-weight:700; padding:12px 14px; color:#fff;
+    background:rgba(123,44,191,.08); user-select:none;
+}
+#text-editors details[open] summary { border-bottom:1px solid rgba(104,80,121,.65); }
+.text-group-body { padding:13px 14px 14px; }
+.text-group-description { margin:0 0 8px; color:#ccc; line-height:1.45; }
+.text-placeholder-hint {
+    margin:0 0 12px; padding:8px 10px; border-radius:6px;
+    background:rgba(185,133,245,.07); color:#aaa; font-size:12px; line-height:1.45;
+}
+.text-placeholder-hint code { color:#e0c8ff; font-family:Consolas, monospace; font-weight:700; }
+.text-rows { display:flex; flex-direction:column; gap:10px; }
+.text-row {
+    display:grid; grid-template-columns:minmax(0, 1fr) auto; gap:10px;
+    align-items:start; margin:0;
+}
+.text-row textarea {
+    width:100%; min-width:0; min-height:76px; resize:vertical; padding:10px 12px;
+    color:#fff; background:#24172e; border:1px solid #685079; border-radius:6px;
+    font:inherit; line-height:1.4; box-sizing:border-box;
+}
+.text-row textarea:focus { outline:none; border-color:#b985f5; box-shadow:0 0 0 2px rgba(185,133,245,.12); }
+#text-editors .text-remove {
+    width:auto !important; min-width:92px; margin:0 !important; padding:10px 12px !important;
+    font-size:13px !important; line-height:1.2; background:rgba(255,107,107,.12) !important;
+    border:1px solid rgba(255,107,107,.42) !important; color:#ffb7b7 !important;
+    box-shadow:none !important;
+}
+#text-editors .text-remove:hover { background:rgba(255,107,107,.22) !important; transform:none; }
+.text-empty {
+    margin:0; padding:11px; border:1px dashed #685079; border-radius:6px;
+    color:#999; background:rgba(255,255,255,.02);
+}
+.text-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:12px; }
+#text-editors .text-action-button {
+    width:auto !important; margin:0 !important; padding:9px 12px !important;
+    font-size:13px !important; box-shadow:none !important;
+}
+#text-editors .text-action-secondary {
+    background:rgba(255,255,255,.08) !important; border:1px solid rgba(255,255,255,.20) !important;
+}
+.milestone-add {
+    display:flex; gap:8px; align-items:end; flex-wrap:wrap; margin-top:12px; padding-top:12px;
+    border-top:1px solid rgba(255,255,255,.10);
+}
+.milestone-add label { margin:0; flex:1 1 220px; }
+.milestone-add input { margin-top:5px; }
+#text-editors .milestone-add button { width:auto !important; margin:0 !important; padding:10px 12px !important; font-size:13px !important; }
+
+#generator-fireworks-layer {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+}
+.firework-test-row {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(255,255,255,.10);
+}
+.firework-test-row .btn-small { width:auto !important; margin:0 0 6px 0 !important; }
+#firework-test-status { color:#cdb6e8; min-height:18px; }
+.feedback-channels { display:flex; flex-wrap:wrap; gap:8px; margin:12px 0 4px; }
+.feedback-channel {
+    display:inline-block; padding:7px 10px; border-radius:999px;
+    background:rgba(185,133,245,.10); border:1px solid rgba(185,133,245,.28); color:#e0c8ff;
+    font-size:13px; font-weight:500;
+}
+@media (max-width:760px) {
+    .text-row { grid-template-columns:1fr; }
+    #text-editors .text-remove { width:100% !important; }
+    .text-actions { flex-direction:column; }
+    #text-editors .text-action-button { width:100% !important; }
+}
+</style>
+    <style id="live-glitter-style"></style>
+</head>
+<body>
+<canvas id="generator-fireworks-layer" aria-hidden="true"></canvas>
+
+<div class="container">
+    <div class="header-container">
+        <div class="header-text">
+            <h1>Stream Chat Overlay <span class="version-badge">v1.1.1</span></h1>
+            <p class="subtitle">Stelle dein Overlay ein, teste die wichtigsten Funktionen und lade danach die fertige HTML-Datei für OBS herunter.</p>
+            <div class="preset-note">💜 Standard-Preset: <strong>einfachNat</strong> – alle Werte können geändert werden.</div>
+        </div>
+        <div class="header-preview-wrapper">
+            <div class="header-preview" id="animated-preview-box"></div>
+            <div class="preview-input-area">
+                <input type="text" id="custom-preview-msg" placeholder="Teste den Chat..." onkeypress="if(event.key === 'Enter') sendCustomPreviewMsg()">
+                <button type="button" onclick="sendCustomPreviewMsg()">Chat</button>
+            </div>
+            <div class="preview-action-row">
+                <button type="button" class="btn-small" onclick="sendAffiliatePreview('reward')">Kanalpunkte</button>
+                <button type="button" class="btn-small" onclick="sendAffiliatePreview('streak5')">Serie 5</button>
+                <button type="button" class="btn-small" onclick="sendAffiliatePreview('streak25')">Serie 25</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Vorhandenes Overlay laden</h2><p>Wähle deine bisherige Chat-HTML. Der Dateiname ist beliebig. Die Datei wird lokal gelesen und nicht hochgeladen.</p><input type="file" id="overlay-import" accept=".html,.htm,text/html"><p id="import-status" role="status" aria-live="polite"></p></div><div class="section"><h2>1. Streamer.bot Verbindung & System</h2>
+        <p class="section-desc">Verknüpfe deine Plattformen mit Streamer.bot und starte dort den WebSocket Server. Standard: <b>127.0.0.1:8080</b>.</p>
+        <div class="grid-2">
+            <div class="form-group"><label>WebSocket IP</label><input type="text" id="cfg-ws-ip" value="127.0.0.1"></div>
+            <div class="form-group"><label>WebSocket Port</label><input type="number" id="cfg-ws-port" value="8080" min="1" max="65535"></div>
+            <div class="form-group">
+                <label>System-Name im Chat</label><input type="text" id="cfg-sys-name" value="einfachNat">
+                <div class="note">Unter diesem Namen meldet sich das Overlay bei Systemmeldungen.</div>
+            </div>
+            <div class="form-group">
+                <label>Twitch-Profil für System-Bild</label><input type="text" id="cfg-sys-account" value="einfachnat">
+                <div class="note">Twitch-Loginname für das Profilbild.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>2. Allgemeine Einstellungen</h2>
+        <p class="section-desc">Wie soll sich der normale Chat im Stream verhalten?</p>
+        <div class="grid-2">
+            <div class="form-group">
+                <label>Anzeigedauer (Sekunden)</label><input type="number" id="cfg-dauer" value="45" min="0">
+                <div class="note">0 = Nachrichten bleiben dauerhaft sichtbar.</div>
+            </div>
+            <div class="form-group">
+                <label>Neue Nachrichten erscheinen</label>
+                <select id="cfg-richtung">
+                    <option value="1">UNTEN – Chat wächst nach oben</option>
+                    <option value="2">OBEN – Chat wächst nach unten</option>
+                </select>
+            </div>
+        </div>
+        <div class="checkbox-group"><input type="checkbox" id="cfg-twitch" checked><label for="cfg-twitch">Twitch Chat anzeigen</label></div>
+        <div class="checkbox-group"><input type="checkbox" id="cfg-youtube" checked><label for="cfg-youtube">YouTube Chat anzeigen</label></div>
+    </div>
+
+    <div class="section affiliate-section">
+        <h2>3. Twitch Affiliate <span class="new-badge">NEU in 1.1.1</span></h2>
+        <p class="section-desc">Kanalpunkte und Zuschauerserien werden über Twitch-Events von Streamer.bot eingeblendet. Nicht benötigt? Einfach ausschalten.</p>
+
+        <div class="feature-card">
+            <div class="checkbox-group"><input type="checkbox" id="cfg-channel-points" checked><label for="cfg-channel-points"><strong>Kanalpunkte-Einlösungen anzeigen</strong></label></div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Name deiner Kanalpunkte</label><input type="text" id="cfg-currency" value="Kanalpunkte">
+                    <div class="note">Dieser Begriff erhält in Eventmeldungen automatisch den Regenbogeneffekt.</div>
+                </div>
+                <div class="form-group">
+                    <label>Dateiname des Kanalpunkte-Bildes</label><input type="text" id="cfg-coin-gif-file" value="Kanalpunkte.gif">
+                    <div class="note">Unterstützt werden GIF, PNG, JPG/JPEG und WebP. Die Bilddatei muss neben der fertigen HTML-Datei liegen.</div>
+                </div>
+            </div>
+            <div class="checkbox-group"><input type="checkbox" id="cfg-coin-gif" checked><label for="cfg-coin-gif">Kanalpunkte-Bild anzeigen</label></div>
+        </div>
+
+        <div class="feature-card">
+            <div class="checkbox-group"><input type="checkbox" id="cfg-watch-streaks" checked><label for="cfg-watch-streaks"><strong>Zuschauerserien im Chat anzeigen</strong></label></div>
+            <div class="checkbox-group"><input type="checkbox" id="cfg-streak-coins" checked><label for="cfg-streak-coins">Von Twitch vergebene Kanalpunkte erwähnen</label></div>
+            <div class="checkbox-group"><input type="checkbox" id="cfg-fireworks" checked><label for="cfg-fireworks">Feuerwerk anzeigen</label></div>
+            <div class="checkbox-group"><input type="checkbox" id="cfg-firework-sound" checked><label for="cfg-firework-sound">Feuerwerk-Sound abspielen</label></div>
+            <div class="form-group">
+                <label for="cfg-firework-volume">Feuerwerk-Lautstärke: <span id="firework-volume-value">22 %</span></label>
+                <input type="range" id="cfg-firework-volume" min="0" max="100" value="22">
+                <div class="note">0 % = stumm, 100 % = volle Lautstärke.</div>
+            </div>
+            <div class="firework-test-row">
+                <button type="button" class="btn-small" onclick="testGeneratorFireworks()">🎆 Feuerwerk testen</button>
+                <div class="note">Testet das doppelte Meilenstein-Feuerwerk mit der aktuell eingestellten Lautstärke. Ist der Sound ausgeschaltet, bleibt der Test stumm.</div>
+                <div class="note" id="firework-test-status"></div>
+            </div>
+        </div>
+        <div class="note">Eigene Texte lassen sich unten bearbeiten. Leere Listen bleiben auch beim Import leer.</div>
+    </div>
+
+    <div class="section">
+        <h2>4. Farben & Darstellung</h2>
+        <p class="section-desc">Passe das Aussehen der Chatblasen an. Vorschau und Download verwenden dieselbe Deckkraft.</p>
+        <div style="display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap;">
+            <div style="flex:1; min-width:250px;">
+                <div class="color-picker-group"><input type="color" id="cfg-color-name" value="#ffffff"><label>Farbe für den Benutzernamen</label></div>
+                <div class="color-picker-group"><input type="color" id="cfg-color-text" value="#ffffff"><label>Farbe für den Nachrichtentext</label></div>
+                <div class="color-picker-group"><input type="color" id="cfg-color-bubble" value="#2d1446"><label>Farbe für die Chatblase</label></div>
+                <div class="form-group">
+                    <label for="cfg-bubble-opacity">Deckkraft der Chatblase: <span id="bubble-opacity-value">100 %</span></label>
+                    <input type="range" id="cfg-bubble-opacity" min="0" max="100" value="100">
+                    <div class="note">100 % = vollständig deckend. Standard ist 100 %.</div>
+                </div>
+            </div>
+            <div id="preview-container" style="flex:1; background:#000; padding:20px; border-radius:15px; border:1px solid #5a3885; display:flex; flex-direction:column; align-items:flex-end; position:relative;">
+                <button type="button" class="btn-small" id="toggle-preview-btn" onclick="togglePreviewBg()" style="position:absolute; top:10px; left:10px;">Hintergrund Hell/Dunkel</button>
+                <label id="preview-label" style="color:#aaa; font-size:12px; margin-bottom:10px; align-self:flex-start; margin-top:30px;">Statische Vorschau</label>
+                <div style="display:flex; flex-direction:column; align-items:flex-end; max-width:100%;">
+                    <span id="prev-name" class="hp-name">ZuschauerName</span>
+                    <div id="prev-bubble" class="hp-bubble"><span id="prev-text">Das ist eine Testnachricht!</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>5. Rollen, Abzeichen & Aufleuchten</h2>
+        <p class="section-desc">Lege fest, wer besondere Icons bekommt und in welcher Farbe VIPs und Mods aufleuchten.</p>
+        <div class="form-group">
+            <label>Hauptmoderatoren (Twitch-Namen, mit Komma trennen)</label><input type="text" id="cfg-hauptmods" value="">
+            <div class="note">Streamer.bot unterscheidet Hauptmoderatoren nicht automatisch. Hier kannst du sie manuell festlegen.</div>
+        </div>
+        <label>Dateinamen der Abzeichen-Icons</label>
+        <div class="note">Diese Bilder müssen im selben Ordner wie deine Chat-Overlay-Datei liegen.</div><br>
+        <div class="grid-2">
+            <div class="form-group"><label>Broadcaster</label><input type="text" id="cfg-icon-broadcaster" value="isBroadcaster.png"></div>
+            <div class="form-group"><label>Hauptmod</label><input type="text" id="cfg-icon-hauptmod" value="isMainmod.png"></div>
+            <div class="form-group"><label>Moderator</label><input type="text" id="cfg-icon-mod" value="isMod.png"></div>
+            <div class="form-group"><label>VIP</label><input type="text" id="cfg-icon-vip" value="isVip.png"></div>
+        </div>
+        <div class="checkbox-group" style="margin-top:15px; border-top:1px solid rgba(255,255,255,.1); padding-top:15px;">
+            <input type="checkbox" id="cfg-glitter" checked><label for="cfg-glitter">Mystisches Aufleuchten für VIPs und Mods aktivieren</label>
+        </div>
+        <div style="display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap; margin-top:15px;">
+            <div style="flex:1; min-width:250px;">
+                <div class="color-picker-group"><input type="color" id="cfg-color-vip" value="#c864ff"><label>Leuchtfarbe für VIPs</label></div>
+                <div class="color-picker-group"><input type="color" id="cfg-color-mod" value="#87cefa"><label>Leuchtfarbe für Mods und Hauptmods</label></div>
+            </div>
+            <div style="flex:1; background:#1a0f2b; padding:20px; border-radius:10px; border:1px solid #5a3885;">
+                <label style="text-align:center; display:block; margin-bottom:5px;">Vorschau</label>
+                <p class="note" style="text-align:center; margin-top:0;">Im fertigen Chat leuchtet es nur 1× je Nachricht auf.</p>
+                <div style="display:flex; justify-content:space-around; margin-top:25px;">
+                    <div><div class="preview-avatar-container vip-preview"><div class="preview-avatar"></div></div><div style="text-align:center; margin-top:20px; font-weight:bold;">VIP</div></div>
+                    <div><div class="preview-avatar-container mod-preview"><div class="preview-avatar"></div></div><div style="text-align:center; margin-top:20px; font-weight:bold;">Mod</div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>6. Eigene Chatbefehle & Filter</h2>
+        <p class="section-desc">Zuschauer können ihre Farben ändern; Mods können Nachrichten über den Sniper-Befehl entfernen.</p>
+        <div class="grid-2">
+            <div class="form-group"><label>Befehl: Namensfarbe</label><input type="text" id="cfg-cmd-name" value="!namefarbe"></div>
+            <div class="form-group"><label>Befehl: Bubblefarbe</label><input type="text" id="cfg-cmd-bubble" value="!bubblefarbe"></div>
+            <div class="form-group"><label>Befehl: Textfarbe</label><input type="text" id="cfg-cmd-text" value="!textfarbe"></div>
+            <div class="form-group"><label>Befehl: Farben zurücksetzen</label><input type="text" id="cfg-cmd-reset" value="!farbenreset"></div>
+            <div class="form-group" style="grid-column:1 / -1;">
+                <label>Befehl: Nachricht löschen (Sniper)</label><input type="text" id="cfg-cmd-sniper" value="!del">
+                <div class="note">Nur Broadcaster & Mods. Beispiele: <b>!del @Name</b>, <b>!del @Name 3</b> oder <b>!del 5</b>.</div>
+            </div>
+        </div>
+        <div class="checkbox-group" style="margin-top:15px;"><input type="checkbox" id="cfg-hide-color-cmds" checked><label for="cfg-hide-color-cmds">Farbkommandos automatisch im Stream verstecken</label></div>
+        <div class="form-group" style="margin-top:15px;">
+            <label>Weitere Wörter filtern (Ignorieren-Liste)</label><textarea id="cfg-hidden-cmds" rows="2">!lurk, !discord, !socials</textarea>
+            <div class="note">Nachrichten, die mit einem dieser Begriffe beginnen, werden vom Overlay ignoriert.</div>
+        </div>
+    </div>
+
+    <details class="section advanced-section">
+        <summary>Erweiterte Einstellungen</summary>
+        <div class="advanced-content">
+            <div class="checkbox-group"><input type="checkbox" id="cfg-diagnostics"><label for="cfg-diagnostics"><strong>Diagnosefunktionen für Fehlersuche einbauen</strong></label></div>
+            <div class="note">Standardmässig wird der komplette Debug-/Rohdaten-Inspector nicht in die Overlay-Datei eingebaut. Die Diagnoseversion startet mit sichtbarem Debugpanel und wird als <b>chat_overlay_diagnose.html</b> gespeichert.</div>
+        </div>
+    </details>
+
+    <div class="section text-editor-section">
+        <h2>Eigene Texte für Kanalpunkte & Zuschauerserien</h2>
+        <p class="text-editor-intro">
+            Hier legst du fest, welche Meldungen bei Kanalpunkte-Einlösungen und bei Zuschauerserien im Chat erscheinen können.
+            Öffne einfach eine Gruppe und passe die Sätze an. Gibt es mehrere Varianten, wählt das Overlay zufällig eine davon aus.
+            Du kannst Texte ändern, löschen oder weitere hinzufügen.
+        </p>
+        <div class="placeholder-help">
+            <strong>Was bedeuten die Wörter in {geschweiften Klammern}?</strong>
+            <p>Diese Platzhalter werden später automatisch durch die passenden Werte ersetzt. Lass sie im Text stehen, wenn du die jeweilige Information anzeigen möchtest.</p>
+            <div class="placeholder-grid">
+                <span class="placeholder-chip"><code>{user}</code> Name des Zuschauers</span>
+                <span class="placeholder-chip"><code>{reward}</code> Name der Belohnung</span>
+                <span class="placeholder-chip"><code>{cost}</code> Kosten der Einlösung</span>
+                <span class="placeholder-chip"><code>{currency}</code> Name deiner Kanalpunkte</span>
+                <span class="placeholder-chip"><code>{streak}</code> Streams in Folge</span>
+                <span class="placeholder-chip"><code>{coins}</code> von Twitch vergebene Kanalpunkte</span>
+                <span class="placeholder-chip"><code>{input}</code> zusätzlicher Text des Zuschauers</span>
+            </div>
+        </div>
+        <div id="text-editors"></div>
+    </div>
+
+    <div class="feedback-box">
+        <strong>💡 Dir fehlt eine Funktion oder du hast eine Idee?</strong>
+        <p>Schreib mir gerne, wenn etwas nicht funktioniert oder dir noch eine Funktion fehlt. Gute Ideen können in eine zukünftige Version einfliessen und stehen dann allen zur Verfügung.</p>
+        <div class="feedback-channels">
+            <span class="feedback-channel">GitHub Issues · bevorzugt für Bugs & Wünsche</span>
+            <span class="feedback-channel">Discord-DM</span>
+            <span class="feedback-channel">Instagram-DM</span>
+        </div>
+        <div class="note">Und wenn ich gerade live bin: Komm gerne im Stream vorbei und schreib mir dort. 😊</div>
+    </div>
+
+    <div class="checkbox-group license-group">
+        <input type="checkbox" id="cfg-license">
+        <label for="cfg-license">
+            <strong style="color:#e0c8ff; display:block; margin-bottom:5px; font-size:16px;">Kostenlose Nutzung für die Community</strong>
+            Du darfst dieses Overlay völlig kostenlos in deinen Streams und Videos nutzen, für deinen eigenen Gebrauch anpassen und verändern.
+            Eine Namensnennung oder Verlinkung ist freiwillig – mach dir keinen Stress!<br><br>
+            <strong style="color:#ff6b6b;">Einzige feste Regel:</strong> Der Weiterverkauf dieses Codes (auch in abgewandelter Form) oder die Einbindung in kostenpflichtige Produkte ist nicht erlaubt.
+        </label>
+    </div>
+
+    <button class="download-button" onclick="generateOverlay()">Chat-Overlay 1.1.1 erstellen & herunterladen</button>
+    <div class="license-text">Generator & Overlay v1.1.1 · einfachNat · einfachnat.ch/chat-overlay</div>
+</div>
+
+
+<script>
+    // ==========================================
+    // VORSCHAU-CHAT EINSTELLUNGEN
+    // Hier kannst du die Namen und Nachrichten für die 
+    // animierte Vorschau ganz oben auf der Seite anpassen.
+    // ==========================================
+    const TEXT_DEFAULTS = {"KANALPUNKTE_TEXTE":["{user} löst «{reward}» für {cost} {currency} ein!","{user} hat «{reward}» für {cost} {currency} eingelöst."],"KANALPUNKTE_INPUT_TEXTE":["{user}: «{input}»","Nachricht von {user}: «{input}»"],"AUTOMATISCHE_REWARD_TEXTE":["{user} schaltet «{reward}» für {cost} {currency} frei!"],"SERIE_KLEIN":["{user} ist {streak} Streams in Folge dabei!","{streak} Streams in Folge für {user}!"],"SERIE_MITTEL":["{user} erreicht {streak} Streams in Folge!"],"SERIE_GROSS":["{user} ist bei {streak} Streams in Folge dabei!"],"SERIE_EXTREM":["{streak} Streams hintereinander – danke, {user}!"],"SERIE_LEGENDAER":["{user} erreicht eine Serie von {streak} Streams!"],"SERIE_MEILENSTEINE":{"5":["5 Streams in Folge! Glückwunsch, {user}!"],"10":["10 Streams in Folge! Glückwunsch, {user}!"],"25":["25 Streams in Folge! Glückwunsch, {user}!"],"50":["50 Streams in Folge! Glückwunsch, {user}!"],"100":["100 Streams in Folge! Glückwunsch, {user}!"]},"SERIE_COIN_TEXTE":["{user} erhält {coins} {currency} für die Serie."],"SERIE_INPUT_TEXTE":["{user}: «{input}»"]};
+    const cloneConfig = value => JSON.parse(JSON.stringify(value));
+    function safeJSON(value) { return JSON.stringify(value).replace(/</g, '\\u003c').replace(/\u2028/g, '\\u2028').replace(/\u2029/g, '\\u2029'); }
+    let textValues = cloneConfig(TEXT_DEFAULTS);
+    let fieldDefaults;
+    const textGroups = {
+        channelPoints: [
+            {
+                key: 'KANALPUNKTE_TEXTE',
+                title: 'Normale Kanalpunkte-Einlösungen',
+                description: 'Diese Meldung erscheint, wenn jemand eine deiner eigenen Kanalpunkte-Belohnungen einlöst.',
+                placeholders: ['user', 'reward', 'cost', 'currency']
+            },
+            {
+                key: 'KANALPUNKTE_INPUT_TEXTE',
+                title: 'Zusätzlicher Text bei einer Einlösung',
+                description: 'Falls die Belohnung eine Texteingabe erlaubt, kann diese zusätzliche Zeile unter der Einlösung erscheinen.',
+                placeholders: ['user', 'input']
+            },
+            {
+                key: 'AUTOMATISCHE_REWARD_TEXTE',
+                title: 'Twitch-Standardbelohnungen',
+                description: 'Diese Meldung wird für Kanalpunkte-Belohnungen verwendet, die Twitch selbst verwaltet.',
+                placeholders: ['user', 'reward', 'cost', 'currency']
+            }
+        ],
+        streaks: [
+            { key:'SERIE_KLEIN', title:'2–4 Streams in Folge', description:'Diese Meldungen können bei einer Serie von 2 bis 4 Streams erscheinen.', placeholders:['user','streak'] },
+            { key:'SERIE_MITTEL', title:'5–9 Streams in Folge', description:'Diese Meldungen können bei einer Serie von 5 bis 9 Streams erscheinen. Ein eigener Meilenstein hat Vorrang.', placeholders:['user','streak'] },
+            { key:'SERIE_GROSS', title:'10–24 Streams in Folge', description:'Diese Meldungen können bei einer Serie von 10 bis 24 Streams erscheinen. Ein eigener Meilenstein hat Vorrang.', placeholders:['user','streak'] },
+            { key:'SERIE_EXTREM', title:'25–49 Streams in Folge', description:'Diese Meldungen können bei einer Serie von 25 bis 49 Streams erscheinen. Ein eigener Meilenstein hat Vorrang.', placeholders:['user','streak'] },
+            { key:'SERIE_LEGENDAER', title:'50 oder mehr Streams in Folge', description:'Diese Meldungen können ab 50 Streams in Folge erscheinen. Ein eigener Meilenstein hat Vorrang.', placeholders:['user','streak'] },
+            { key:'SERIE_COIN_TEXTE', title:'Zusatzzeile für vergebene Kanalpunkte', description:'Wenn Twitch für die Serie Kanalpunkte vergibt und du diese anzeigen lässt, wird diese Zusatzzeile verwendet.', placeholders:['user','streak','coins','currency'] },
+            { key:'SERIE_INPUT_TEXTE', title:'Zusätzlicher Zuschauertext', description:'Falls Twitch bei einer Serienmeldung einen zusätzlichen Text mitsendet, kann diese Zeile darunter erscheinen.', placeholders:['user','input','streak'] }
+        ]
+    };
+    function configFields() { return [...document.querySelectorAll('[id^="cfg-"]')].filter(e => /^(INPUT|SELECT|TEXTAREA)$/.test(e.tagName) && e.id !== 'cfg-license'); }
+    function readFields() { return Object.fromEntries(configFields().map(e=>[e.id.slice(4),e.type==='checkbox'?e.checked:e.value])); }
+    function collectConfig() { return {schemaVersion:1,overlayVersion:'1.1.1',settings:readFields(),texts:cloneConfig(textValues)}; }
+    function validTexts(v) { return Array.isArray(v) && v.length<=1000 && v.every(x=>typeof x==='string' && x.length<=20000); }
+    function mergeConfig(imported) {
+        const result={schemaVersion:1,overlayVersion:'1.1.1',settings:cloneConfig(fieldDefaults),texts:cloneConfig(TEXT_DEFAULTS)};
+        const settings=imported.settings || {};
+        for(const e of configFields()) {
+            const k=e.id.slice(4), v=settings[k];
+            if(e.type==='checkbox') { if(typeof v==='boolean') result.settings[k]=v; continue; }
+            if(typeof v!=='string' && typeof v!=='number') continue;
+            const s=String(v);
+            if(e.type==='color' && !/^#[0-9a-f]{6}$/i.test(s)) continue;
+            if(e.tagName==='SELECT' && ![...e.options].some(o=>o.value===s)) continue;
+            if(e.type==='number' || e.type==='range') {
+                if(s.trim()==='' || !Number.isFinite(Number(s))) continue;
+                result.settings[k]=String(Math.max(e.min===''?-Infinity:Number(e.min),Math.min(e.max===''?Infinity:Number(e.max),Number(s))));
+            } else result.settings[k]=s;
+        }
+        const texts=imported.texts || {};
+        for(const key of Object.keys(TEXT_DEFAULTS)) {
+            if(key==='SERIE_MEILENSTEINE') {
+                if(texts[key] && typeof texts[key]==='object' && !Array.isArray(texts[key]))
+                    for(const n of Object.keys(texts[key])) if(/^[1-9]\d{0,5}$/.test(n) && validTexts(texts[key][n])) result.texts[key][n]=[...texts[key][n]];
+            } else if(Object.hasOwn(texts,key) && validTexts(texts[key])) result.texts[key]=[...texts[key]];
+        }
+        return result;
+    }
+    function applyConfig(config) {
+        for(const e of configFields()) { const v=config.settings[e.id.slice(4)]; if(e.type==='checkbox') e.checked=v; else e.value=v; }
+        textValues=cloneConfig(config.texts); renderTextEditors(); updateLivePreview();
+    }
+    function renderTextEditors() {
+        const root = document.getElementById('text-editors');
+        root.replaceChildren();
+
+        const placeholderNames = {
+            user: 'Name des Zuschauers',
+            reward: 'Name der Belohnung',
+            cost: 'Kosten der Einlösung',
+            currency: 'Name deiner Kanalpunkte',
+            streak: 'Streams in Folge',
+            coins: 'vergebene Kanalpunkte',
+            input: 'zusätzlicher Text des Zuschauers'
+        };
+
+        function createCategory(title, description) {
+            const category = document.createElement('div');
+            category.className = 'text-editor-category';
+            const heading = document.createElement('h3');
+            heading.textContent = title;
+            const intro = document.createElement('p');
+            intro.textContent = description;
+            category.append(heading, intro);
+            root.append(category);
+            return category;
+        }
+
+        function group(parent, key, title, description, placeholders, milestone) {
+            const box = document.createElement('details');
+            const heading = document.createElement('summary');
+            heading.textContent = title;
+            box.append(heading);
+
+            const body = document.createElement('div');
+            body.className = 'text-group-body';
+
+            const desc = document.createElement('p');
+            desc.className = 'text-group-description';
+            desc.textContent = description;
+            body.append(desc);
+
+            const hint = document.createElement('div');
+            hint.className = 'text-placeholder-hint';
+            hint.innerHTML = '<strong>Platzhalter in dieser Gruppe:</strong> ' + placeholders
+                .map(name => `<code>{${name}}</code> = ${placeholderNames[name] || name}`)
+                .join(' · ');
+            body.append(hint);
+
+            const rows = document.createElement('div');
+            rows.className = 'text-rows';
+            body.append(rows);
+
+            const get = () => milestone ? textValues[key][milestone] : textValues[key];
+            const set = value => {
+                if (milestone) textValues[key][milestone] = value;
+                else textValues[key] = value;
+            };
+
+            function draw() {
+                rows.replaceChildren();
+                get().forEach((text, i) => {
+                    const row = document.createElement('div');
+                    row.className = 'text-row';
+
+                    const input = document.createElement('textarea');
+                    input.value = text;
+                    input.rows = 2;
+                    input.setAttribute('aria-label', title + ' – Text ' + (i + 1));
+                    input.addEventListener('input', () => get()[i] = input.value);
+
+                    const remove = document.createElement('button');
+                    remove.type = 'button';
+                    remove.className = 'text-remove';
+                    remove.textContent = 'Text löschen';
+                    remove.setAttribute('aria-label', title + ' – Text ' + (i + 1) + ' löschen');
+                    remove.onclick = () => {
+                        get().splice(i, 1);
+                        draw();
+                    };
+
+                    row.append(input, remove);
+                    rows.append(row);
+                });
+
+                if (!get().length) {
+                    const empty = document.createElement('p');
+                    empty.className = 'text-empty';
+                    empty.textContent = 'Keine Texte hinterlegt. Für diese Gruppe wird keine normale Textmeldung ausgegeben.';
+                    rows.append(empty);
+                }
+            }
+
+            const actions = document.createElement('div');
+            actions.className = 'text-actions';
+
+            const add = document.createElement('button');
+            add.type = 'button';
+            add.className = 'text-action-button';
+            add.textContent = '+ Weiteren Text hinzufügen';
+            add.onclick = () => {
+                get().push('');
+                draw();
+                rows.querySelector('.text-row:last-child textarea')?.focus();
+            };
+
+            const hasDefault = !milestone || Object.hasOwn(TEXT_DEFAULTS[key], String(milestone));
+            const reset = document.createElement('button');
+            reset.type = 'button';
+            reset.className = 'text-action-button text-action-secondary';
+            reset.textContent = hasDefault ? 'Standard wiederherstellen' : 'Alle Texte entfernen';
+            reset.onclick = () => {
+                set(cloneConfig(milestone ? (TEXT_DEFAULTS[key][milestone] || []) : TEXT_DEFAULTS[key]));
+                draw();
+            };
+
+            actions.append(add, reset);
+            body.append(actions);
+            box.append(body);
+            draw();
+            parent.append(box);
+        }
+
+        const pointsCategory = createCategory(
+            'Kanalpunkte-Einlösungen',
+            'Hier bestimmst du die Texte, die bei Einlösungen deiner Twitch-Kanalpunkte erscheinen.'
+        );
+        for (const item of textGroups.channelPoints) {
+            group(pointsCategory, item.key, item.title, item.description, item.placeholders);
+        }
+
+        const streakCategory = createCategory(
+            'Zuschauerserien',
+            'Twitch kann anzeigen, wenn jemand mehrere deiner Streams hintereinander gesehen hat. Hier bestimmst du die Texte für die verschiedenen Serienlängen.'
+        );
+        for (const item of textGroups.streaks) {
+            group(streakCategory, item.key, item.title, item.description, item.placeholders);
+        }
+
+        const milestoneCategory = createCategory(
+            'Besondere Meilensteine',
+            'Für bestimmte Serienlängen kannst du besondere Texte verwenden. Ein Meilenstein hat bei exakt dieser Anzahl Vorrang vor dem normalen Serientext.'
+        );
+        for (const n of Object.keys(textValues.SERIE_MEILENSTEINE).sort((a, b) => a - b)) {
+            group(
+                milestoneCategory,
+                'SERIE_MEILENSTEINE',
+                n + ' Streams in Folge',
+                'Dieser Text wird verwendet, wenn ein Zuschauer exakt ' + n + ' Streams in Folge erreicht.',
+                ['user', 'streak'],
+                n
+            );
+        }
+
+        const milestoneAdd = document.createElement('div');
+        milestoneAdd.className = 'milestone-add';
+        const label = document.createElement('label');
+        label.textContent = 'Eigenen weiteren Meilenstein hinzufügen:';
+        const count = document.createElement('input');
+        count.type = 'number';
+        count.min = '1';
+        count.max = '999999';
+        count.value = '200';
+        label.append(count);
+
+        const addMilestone = document.createElement('button');
+        addMilestone.type = 'button';
+        addMilestone.textContent = '+ Meilenstein hinzufügen';
+        addMilestone.onclick = () => {
+            const n = Number(count.value);
+            if (!Number.isInteger(n) || n < 1 || n > 999999) {
+                count.reportValidity();
+                return;
+            }
+            if (!Object.hasOwn(textValues.SERIE_MEILENSTEINE, n)) {
+                textValues.SERIE_MEILENSTEINE[n] = [];
+                renderTextEditors();
+            }
+        };
+        milestoneAdd.append(label, addMilestone);
+        milestoneCategory.append(milestoneAdd);
+    }
+    // Parse data literals only. Imported JavaScript is never evaluated.
+    function readLiteral(source,start) {
+        let i=start;
+        function space(){while(i<source.length){if(/\s/.test(source[i])){i++;continue;}if(source.slice(i,i+2)==='//'){i=source.indexOf('\n',i);if(i<0)i=source.length;continue;}if(source.slice(i,i+2)==='/*'){const end=source.indexOf('*/',i+2);if(end<0)throw Error('Kommentar');i=end+2;continue;}break;}}
+        function value(depth=0){if(depth>30)throw Error('Zu tief');space();const c=source[i];
+            if(c==='"'||c==="'"){i++;let out='';while(i<source.length){let x=source[i++];if(x===c)return out;if(x==='\\'){x=source[i++];const escapes={n:'\n',r:'\r',t:'\t',b:'\b',f:'\f',v:'\v','0':'\0'};if(x==='u'||x==='x'){const size=x==='u'?4:2,hex=source.slice(i,i+size);if(!new RegExp('^[0-9a-f]{'+size+'}$','i').test(hex))throw Error('Escape');out+=String.fromCharCode(parseInt(hex,16));i+=size;}else out+=Object.hasOwn(escapes,x)?escapes[x]:x;}else out+=x;}throw Error('String');}
+            if(c==='['||c==='{'){i++;const array=c==='[',out=array?[]:Object.create(null),end=array?']':'}';space();while(source[i]!==end){if(array)out.push(value(depth+1));else{space();let key;if(source[i]==='"'||source[i]==="'")key=value(depth+1);else{const m=/^[\w]+/.exec(source.slice(i));if(!m)throw Error('Schlüssel');key=m[0];i+=key.length;}space();if(source[i++]!==':')throw Error('Doppelpunkt');out[key]=value(depth+1);}space();if(source[i]===end)break;if(source[i++]!==',')throw Error('Komma');space();}i++;return out;}
+            const m=/^(?:true\b|false\b|null\b|-?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?)/i.exec(source.slice(i));if(!m)throw Error('Kein Datenliteral');i+=m[0].length;return JSON.parse(m[0]);
+        }
+        const result=value();space();return {value:result,end:i};
+    }
+    const LEGACY_FIELDS={WS_IP:'ws-ip',WS_PORT:'ws-port',SYSTEM_NAME:'sys-name',SYSTEM_TWITCH_LOGIN:'sys-account',DAUER:'dauer',RICHTUNG:'richtung',ZEIGE_TWITCH:'twitch',ZEIGE_YOUTUBE:'youtube',HAUPT_MODS:'hauptmods',CMD_NAME:'cmd-name',CMD_BUBBLE:'cmd-bubble',CMD_TEXT:'cmd-text',CMD_RESET:'cmd-reset',CMD_SNIPER:'cmd-sniper',VERSTECKTE_BEFEHLE:'hidden-cmds',ENABLE_GLITTER:'glitter',DEF_NAME:'color-name',DEF_TEXT:'color-text',DEF_BUB_HEX:'color-bubble',ICON_BROADCASTER_FILE:'icon-broadcaster',ICON_HAUPTMOD_FILE:'icon-hauptmod',ICON_MOD_FILE:'icon-mod',ICON_VIP_FILE:'icon-vip',ZEIGE_KANALPUNKTE:'channel-points',ZEIGE_ZUSCHAUERSERIEN:'watch-streaks',KANALPUNKTE_WAEHRUNG:'currency',ZEIGE_KANALPUNKTE_GIF:'coin-gif',KANALPUNKTE_GIF_DATEI:'coin-gif-file',ZEIGE_KANALPUNKTE_BILD:'coin-gif',KANALPUNKTE_BILD_DATEI:'coin-gif-file',ZEIGE_SERIEN_COINS:'streak-coins',ZEIGE_SERIEN_FEUERWERK:'fireworks',SERIEN_FEUERWERK_SOUND:'firework-sound',SERIEN_FEUERWERK_LAUTSTAERKE:'firework-volume',DEBUG_MODUS:'diagnostics'};
+    function importHTML(html) {
+        if(html.length>8*1024*1024)throw Error('Die Datei ist zu gross (maximal 8 MB).');
+        const scripts=/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi;let match;
+        while((match=scripts.exec(html))) {
+            if(/\bid\s*=\s*["']einfachnat-overlay-config["']/i.test(match[1])) {
+                const c=JSON.parse(match[2]);
+                if(!c || c.schemaVersion!==1 || !c.settings || typeof c.settings!=='object')throw Error('Dieses Konfigurationsschema wird nicht unterstützt.');
+                return {config:mergeConfig(c),message:'Einstellungen übernommen. Fehlende neue Werte verwenden die Standards von 1.1.1.'};
+            }
+        }
+        if(!/einfachnat/i.test(html) || !/const\s+WS_IP\s*=/.test(html) || !/const\s+DAUER\s*=/.test(html))throw Error('Keine kompatible einfachNat-Konfiguration gefunden.');
+        const c={settings:{},texts:{}}, values={};let found=0;
+        for(const key of [...Object.keys(LEGACY_FIELDS),...Object.keys(TEXT_DEFAULTS),'DEF_BUB_RGBA']) {
+            const m=new RegExp('\\bconst\\s+'+key+'\\s*=\\s*').exec(html);if(!m)continue;
+            try{const parsed=readLiteral(html,m.index+m[0].length);if(html[parsed.end]!==';')continue;values[key]=parsed.value;found++;}catch{}
+        }
+        for(const [key,field] of Object.entries(LEGACY_FIELDS))if(Object.hasOwn(values,key)){
+            let v=values[key];const e=document.getElementById('cfg-'+field);
+            if(e.type==='checkbox')v=v===1||v===true;
+            else if(Array.isArray(v))v=v.join(', ');
+            else if(key==='SERIEN_FEUERWERK_LAUTSTAERKE')v=Number(v)*100;
+            c.settings[field]=v;
+        }
+        if(Object.hasOwn(values,'VERSTECKTE_BEFEHLE'))c.settings['hide-color-cmds']=false;
+        const rgba=/rgba\([^,]+,[^,]+,[^,]+,\s*([\d.]+)\)/.exec(values.DEF_BUB_RGBA||'');if(rgba)c.settings['bubble-opacity']=Number(rgba[1])*100;
+        for(const [role,field] of [['vip','color-vip'],['mod','color-mod']]){const m=new RegExp('@keyframes\\s+'+role+'-glow[\\s\\S]*?50%\\s*\\{[^}]*?border-color:\\s*(#[0-9a-f]{6})','i').exec(html);if(m)c.settings[field]=m[1];}
+        for(const key of Object.keys(TEXT_DEFAULTS))if(Object.hasOwn(values,key))c.texts[key]=values[key];
+        if(!found)throw Error('Keine importierbaren Einstellungen gefunden.');
+        return {config:mergeConfig(c),message:'Älteres Overlay erkannt: '+found+' bekannte Werte gelesen. Nicht rekonstruierbare Werte verwenden aktuelle Standards. Bitte prüfe die Einstellungen.'};
+    }
+    document.addEventListener('DOMContentLoaded',()=>{
+        fieldDefaults=readFields();renderTextEditors();
+        document.getElementById('overlay-import').addEventListener('change',async event=>{
+            const file=event.target.files[0],status=document.getElementById('import-status');if(!file)return;
+            try{if(file.size>8*1024*1024)throw Error('Die Datei ist zu gross (maximal 8 MB).');const result=importHTML(await file.text());applyConfig(result.config);status.textContent='✓ '+result.message;}
+            catch(error){status.textContent='Import nicht möglich: '+error.message;}finally{event.target.value='';}
+        });
+    });
+
+    const PREVIEW_USERS = [
+        "einfachNat", 
+        "Soradis",
+        "LeodaneTheDragon", 
+        "ChatGast", 
+        "fiyahbird", 
+        "GamingFan99"
+    ];
+    
+    const PREVIEW_MESSAGES = [
+        "Folgt einfachNat!",
+        "Six-seven!",
+        "Hallo zusammen! 💜",
+        "Lurke nur kurz, muss gleich weg!",
+        "GG! Richtig gut gespielt.",
+        "Erster!",
+        "www.einfachnat.ch"
+    ];
+    // ==========================================
+
+    const previewCache = {};
+
+    async function getPreviewAvatar(username) {
+        const lowerLogin = username.toLowerCase();
+        if (previewCache[lowerLogin]) return previewCache[lowerLogin];
+        
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 2000);
+            const response = await fetch(`https://decapi.me/twitch/avatar/${lowerLogin}`, { signal: controller.signal });
+            clearTimeout(timeoutId);
+            const url = await response.text();
+            if (url && url.startsWith('http')) {
+                previewCache[lowerLogin] = url;
+                return url;
+            }
+        } catch (error) {}
+        return `https://ui-avatars.com/api/?name=${encodeURIComponent(username)}&background=random&color=fff`;
+    }
+
+    function escapePreviewHTML(value) {
+        return String(value).replace(/[&<>"']/g, ch => ({
+            '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+        }[ch]));
+    }
+
+    async function appendPreviewMessage(username, messageText) {
+        const container = document.getElementById('animated-preview-box');
+        const avatarUrl = await getPreviewAvatar(username);
+
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'hp-msg';
+        msgDiv.innerHTML = `
+            <div class="hp-content">
+                <span class="hp-name">${escapePreviewHTML(username)}</span>
+                <div class="hp-bubble">${escapePreviewHTML(messageText)}</div>
+            </div>
+            <div class="hp-avatar" style="background-image: url('${avatarUrl}');"></div>
+        `;
+        
+        container.appendChild(msgDiv);
+
+        // Nach 8 Sekunden verschwinden lassen
+        setTimeout(() => {
+            if (msgDiv.parentNode) {
+                msgDiv.classList.add('fade-out');
+                setTimeout(() => {
+                    if (msgDiv.parentNode) msgDiv.remove();
+                }, 500); // Warten bis Fade-Out Animation fertig ist
+            }
+        }, 8000);
+
+        // Notfall-Reinigung: Wenn man zu schnell tippt, die älteste Nachricht kicken
+        if (container.children.length > 8) {
+            const oldest = container.firstChild;
+            if (!oldest.classList.contains('fade-out')) {
+                oldest.classList.add('fade-out');
+                setTimeout(() => { if (oldest.parentNode) oldest.remove(); }, 500);
+            }
+        }
+    }
+
+    function spawnRandomMessage() {
+        const randomUser = PREVIEW_USERS[Math.floor(Math.random() * PREVIEW_USERS.length)];
+        const randomMsg = PREVIEW_MESSAGES[Math.floor(Math.random() * PREVIEW_MESSAGES.length)];
+        appendPreviewMessage(randomUser, randomMsg);
+    }
+
+    function sendCustomPreviewMsg() {
+        const input = document.getElementById('custom-preview-msg');
+        const text = input.value.trim();
+        if (text !== "") {
+            appendPreviewMessage("einfachnat", text);
+            input.value = "";
+        }
+    }
+
+    function sendAffiliatePreview(kind) {
+        const currency = document.getElementById('cfg-currency').value.trim() || 'Kanalpunkte';
+        const streak = kind === 'streak25' ? 25 : 5;
+        const pool = kind === 'reward' ? textValues.KANALPUNKTE_TEXTE : textValues.SERIE_MEILENSTEINE[streak];
+        const values = {user:'TestViewer', reward:'Test-Belohnung', cost:50, currency, streak};
+        const text = pool?.length ? pool[Math.floor(Math.random()*pool.length)].replace(/\{(\w+)\}/g, (_,key)=>values[key] ?? '') : 'Für diese Gruppe sind keine Texte hinterlegt.';
+        appendPreviewMessage('TestViewer', text);
+    }
+
+    // ==========================================
+    // FEUERWERK-VORSCHAU IM GENERATOR
+    // Nutzt dieselbe Grundoptik wie das erzeugte Overlay.
+    // Der Test wählt einen aktuell hinterlegten Meilenstein und verwendet
+    // immer einfachNat als Beispiel-Zuschauerin.
+    // ==========================================
+    const generatorFireworksCanvas = document.getElementById('generator-fireworks-layer');
+    const generatorFireworksCtx = generatorFireworksCanvas.getContext('2d');
+    let generatorFireworksParticles = [];
+    let generatorFireworksRAF = null;
+
+    function resizeGeneratorFireworksCanvas() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        generatorFireworksCanvas.width = Math.floor(window.innerWidth * dpr);
+        generatorFireworksCanvas.height = Math.floor(window.innerHeight * dpr);
+        generatorFireworksCanvas.style.width = `${window.innerWidth}px`;
+        generatorFireworksCanvas.style.height = `${window.innerHeight}px`;
+        generatorFireworksCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    window.addEventListener('resize', resizeGeneratorFireworksCanvas);
+    resizeGeneratorFireworksCanvas();
+
+    function generatorFireworksIntensity(streak) {
+        if (streak >= 100) return 3.0;
+        if (streak >= 50) return 2.4;
+        if (streak >= 25) return 2.0;
+        if (streak >= 10) return 1.65;
+        if (streak >= 5) return 1.35;
+        return 1.0;
+    }
+
+    function spawnGeneratorFirework(x, y, intensity = 1) {
+        const count = Math.round(30 + intensity * 14);
+        const hue = Math.floor(Math.random() * 360);
+        for (let i = 0; i < count; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = (1.5 + Math.random() * 3.4) * (0.8 + intensity * 0.18);
+            generatorFireworksParticles.push({
+                x, y, vx:Math.cos(angle)*speed, vy:Math.sin(angle)*speed, life:1,
+                decay:0.012 + Math.random()*0.014, size:1.2 + Math.random()*2.2,
+                hue:(hue + Math.random()*40 - 20 + 360)%360, gravity:0.035 + Math.random()*0.025
+            });
+        }
+    }
+
+    function renderGeneratorFireworks() {
+        generatorFireworksCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        generatorFireworksParticles = generatorFireworksParticles.filter(p => p.life > 0.01);
+        for (const p of generatorFireworksParticles) {
+            p.x += p.vx; p.y += p.vy; p.vx *= 0.988; p.vy = p.vy * 0.988 + p.gravity; p.life -= p.decay;
+            generatorFireworksCtx.beginPath();
+            generatorFireworksCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            generatorFireworksCtx.fillStyle = `hsla(${p.hue}, 100%, 72%, ${Math.max(0,p.life)})`;
+            generatorFireworksCtx.shadowBlur = 10;
+            generatorFireworksCtx.shadowColor = `hsla(${p.hue}, 100%, 65%, ${Math.max(0,p.life)})`;
+            generatorFireworksCtx.fill();
+        }
+        generatorFireworksCtx.shadowBlur = 0;
+        if (generatorFireworksParticles.length) generatorFireworksRAF = requestAnimationFrame(renderGeneratorFireworks);
+        else { generatorFireworksCtx.clearRect(0,0,window.innerWidth,window.innerHeight); generatorFireworksRAF = null; }
+    }
+
+    function playGeneratorFireworkSound(intensity = 1) {
+        if (!document.getElementById('cfg-firework-sound').checked) return;
+        try {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) return;
+            const ctx = new AudioCtx();
+            const master = ctx.createGain();
+            master.gain.value = Math.max(0, Math.min(1, Number(document.getElementById('cfg-firework-volume').value || 0) / 100));
+            master.connect(ctx.destination);
+            const now = ctx.currentTime;
+            const osc = ctx.createOscillator(), oscGain = ctx.createGain();
+            osc.type='sine'; osc.frequency.setValueAtTime(135,now); osc.frequency.exponentialRampToValueAtTime(48,now+0.22);
+            oscGain.gain.setValueAtTime(0.0001,now); oscGain.gain.exponentialRampToValueAtTime(0.55,now+0.012); oscGain.gain.exponentialRampToValueAtTime(0.0001,now+0.32);
+            osc.connect(oscGain).connect(master); osc.start(now); osc.stop(now+0.35);
+            const duration=0.75+Math.min(0.7,intensity*0.16);
+            const buffer=ctx.createBuffer(1,Math.floor(ctx.sampleRate*duration),ctx.sampleRate), channel=buffer.getChannelData(0);
+            for(let i=0;i<channel.length;i++){const envelope=Math.exp(-i/(ctx.sampleRate*0.22));channel[i]=(Math.random()*2-1)*envelope;}
+            const noise=ctx.createBufferSource(), filter=ctx.createBiquadFilter(), noiseGain=ctx.createGain();
+            noise.buffer=buffer; filter.type='highpass'; filter.frequency.value=650; noiseGain.gain.value=0.34+Math.min(0.25,intensity*0.06);
+            noise.connect(filter).connect(noiseGain).connect(master); noise.start(now+0.04); noise.stop(now+duration+0.05);
+            setTimeout(()=>{try{ctx.close();}catch(_){}},1800);
+        } catch (_) {}
+    }
+
+    function launchGeneratorFireworkWave(streak) {
+        const intensity = generatorFireworksIntensity(streak);
+        const bursts = Math.round(2 + intensity * 1.5);
+        const duration = 2200;
+        for (let i=0;i<bursts;i++) {
+            setTimeout(()=>{
+                const x=window.innerWidth*(0.22+Math.random()*0.64), y=window.innerHeight*(0.16+Math.random()*0.56);
+                spawnGeneratorFirework(x,y,intensity);
+                if(!generatorFireworksRAF) renderGeneratorFireworks();
+            }, (duration/Math.max(1,bursts))*i*0.74);
+        }
+        playGeneratorFireworkSound(intensity);
+    }
+
+    function testGeneratorFireworks() {
+        const milestones = Object.keys(textValues.SERIE_MEILENSTEINE || {})
+            .map(Number).filter(n => Number.isInteger(n) && n > 0);
+        const streak = milestones.length ? milestones[Math.floor(Math.random()*milestones.length)] : 5;
+        const pool = textValues.SERIE_MEILENSTEINE?.[streak] || [];
+        const template = pool.length ? pool[Math.floor(Math.random()*pool.length)] : '{user} erreicht {streak} Streams in Folge!';
+        const values = {user:'einfachNat', streak, currency:document.getElementById('cfg-currency').value.trim() || 'Kanalpunkte', coins:0};
+        const message = template.replace(/\{(\w+)\}/g, (_,key)=>values[key] ?? '');
+
+        appendPreviewMessage('einfachNat', message);
+        document.getElementById('firework-test-status').textContent = `Test-Meilenstein: ${streak} Streams – ${message}`;
+
+        // Meilensteine bekommen im fertigen Overlay zwei komplette Wellen.
+        launchGeneratorFireworkWave(streak);
+        setTimeout(()=>launchGeneratorFireworkWave(streak),650);
+    }
+
+    // Starte die zufällige Vorschau
+    setInterval(spawnRandomMessage, 4500);
+    setTimeout(spawnRandomMessage, 500); // Erste Nachricht direkt beim Laden
+
+    // ==========================================
+    // FARB-VORSCHAU & LIZENZ-LOGIK
+    // ==========================================
+    function hexToRgb(hex) {
+        let shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+        hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
+        let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : null;
+    }
+
+    function togglePreviewBg() {
+        const container = document.getElementById('preview-container');
+        const label = document.getElementById('preview-label');
+        const toggleBtn = document.getElementById('toggle-preview-btn');
+        
+        if (container.style.backgroundColor === 'rgb(0, 0, 0)' || container.style.backgroundColor === '#000000' || container.style.backgroundColor === 'black') {
+            container.style.backgroundColor = '#ffffff';
+            label.style.color = '#555';
+            
+            toggleBtn.style.color = '#333';
+            toggleBtn.style.borderColor = 'rgba(0,0,0,0.5)';
+            toggleBtn.style.background = 'rgba(0,0,0,0.05)';
+        } else {
+            container.style.backgroundColor = '#000000';
+            label.style.color = '#aaa';
+            
+            toggleBtn.style.color = '#fff';
+            toggleBtn.style.borderColor = 'rgba(255,255,255,0.3)';
+            toggleBtn.style.background = 'rgba(255,255,255,0.1)';
+        }
+    }
+
+    function updateLivePreview() {
+        const bubbleHex = document.getElementById('cfg-color-bubble').value;
+        const opacity = Math.max(0, Math.min(100, Number(document.getElementById('cfg-bubble-opacity').value || 100)));
+        const bubbleRgb = hexToRgb(bubbleHex) || {r:45, g:20, b:70};
+        const bubbleRgba = `rgba(${bubbleRgb.r}, ${bubbleRgb.g}, ${bubbleRgb.b}, ${opacity / 100})`;
+
+        document.getElementById('bubble-opacity-value').textContent = `${opacity} %`;
+        document.getElementById('firework-volume-value').textContent =
+            `${Number(document.getElementById('cfg-firework-volume').value || 0)} %`;
+
+        document.documentElement.style.setProperty('--prev-name-col', document.getElementById('cfg-color-name').value);
+        document.documentElement.style.setProperty('--prev-text-col', document.getElementById('cfg-color-text').value);
+        document.documentElement.style.setProperty('--prev-bub-col', bubbleRgba);
+
+        document.getElementById('prev-name').style.color = document.getElementById('cfg-color-name').value;
+        document.getElementById('prev-text').style.color = document.getElementById('cfg-color-text').value;
+        document.getElementById('prev-bubble').style.backgroundColor = bubbleRgba;
+
+        const vipHex = document.getElementById('cfg-color-vip').value;
+        const modHex = document.getElementById('cfg-color-mod').value;
+        const vipRgb = hexToRgb(vipHex) || {r:200,g:100,b:255};
+        const modRgb = hexToRgb(modHex) || {r:135,g:206,b:250};
+        const vipRgba = `rgba(${vipRgb.r}, ${vipRgb.g}, ${vipRgb.b}, 0.15)`;
+        const modRgba = `rgba(${modRgb.r}, ${modRgb.g}, ${modRgb.b}, 0.2)`;
+
+        document.getElementById('live-glitter-style').innerHTML = `
+            .vip-preview .preview-avatar { animation: prev-glow-vip 3s infinite ease-in-out; }
+            .vip-preview::after { content:''; position:absolute; top:-21px; left:-21px; right:-21px; bottom:-21px;
+                background:radial-gradient(circle, rgba(255,255,255,.3) 0%, ${vipRgba} 40%, transparent 70%);
+                animation:prev-burst-vip 3s infinite ease-in-out; pointer-events:none; z-index:10; }
+            @keyframes prev-glow-vip { 0%{transform:scale(1);filter:drop-shadow(0 0 0 transparent)}
+                30%{transform:scale(1.02);filter:drop-shadow(0 0 7px ${vipHex});border-color:${vipHex}}
+                100%{transform:scale(1);filter:drop-shadow(0 0 0 transparent)} }
+            @keyframes prev-burst-vip { 0%{transform:scale(.5);opacity:0} 30%{transform:scale(1.2);opacity:1} 100%{transform:scale(1.8);opacity:0} }
+
+            .mod-preview .preview-avatar { animation: prev-glow-mod 3s infinite ease-in-out 1.5s; }
+            .mod-preview::after { content:''; position:absolute; top:-21px; left:-21px; right:-21px; bottom:-21px;
+                background:radial-gradient(circle, rgba(255,255,255,.3) 0%, ${modRgba} 40%, transparent 70%);
+                animation:prev-burst-mod 3s infinite ease-in-out 1.5s; pointer-events:none; z-index:10; }
+            @keyframes prev-glow-mod { 0%{transform:scale(1);filter:drop-shadow(0 0 0 transparent)}
+                30%{transform:scale(1.02);filter:drop-shadow(0 0 7px ${modHex});border-color:${modHex}}
+                100%{transform:scale(1);filter:drop-shadow(0 0 0 transparent)} }
+            @keyframes prev-burst-mod { 0%{transform:scale(.5);opacity:0} 30%{transform:scale(1.2);opacity:1} 100%{transform:scale(1.8);opacity:0} }
+        `;
+    }
+
+    document.querySelectorAll('input[type="color"]').forEach(el => el.addEventListener('input', updateLivePreview));
+    document.getElementById('cfg-bubble-opacity').addEventListener('input', updateLivePreview);
+    document.getElementById('cfg-firework-volume').addEventListener('input', updateLivePreview);
+    updateLivePreview();
+
+    function clampNumber(value, min, max, fallback) {
+        const n = Number(value);
+        if (!Number.isFinite(n)) return fallback;
+        return Math.min(max, Math.max(min, n));
+    }
+
+    function removeOrKeepDebugBlocks(text, keep) {
+        if (keep) {
+            return text
+                .replace(/\/\* DEBUG_ONLY_START \*\//g, '')
+                .replace(/\/\* DEBUG_ONLY_END \*\//g, '');
+        }
+        return text.replace(/\/\* DEBUG_ONLY_START \*\/[\s\S]*?\/\* DEBUG_ONLY_END \*\//g, '');
+    }
+
+    function generateOverlay() {
+        if (!document.getElementById('cfg-license').checked) {
+            alert('Bitte bestätige zuerst die kostenlosen Nutzungsbedingungen für die Community!');
+            return;
+        }
+
+        const js = safeJSON;
+
+        const wsIp = document.getElementById('cfg-ws-ip').value.trim() || "127.0.0.1";
+        const wsPort = String(Math.round(clampNumber(document.getElementById('cfg-ws-port').value, 1, 65535, 8080)));
+        const sysName = document.getElementById('cfg-sys-name').value.trim() || "einfachNat";
+        const sysAccount = document.getElementById('cfg-sys-account').value.trim().toLowerCase() || "einfachnat";
+
+        const dauer = Math.max(0, Math.round(clampNumber(document.getElementById('cfg-dauer').value, 0, 86400, 45)));
+        const richtung = document.getElementById('cfg-richtung').value === "2" ? 2 : 1;
+        const twitch = document.getElementById('cfg-twitch').checked ? 1 : 0;
+        const youtube = document.getElementById('cfg-youtube').checked ? 1 : 0;
+
+        if (!twitch && !youtube && !confirm('Twitch und YouTube sind beide deaktiviert. Trotzdem erstellen?')) return;
+
+        const defName = document.getElementById('cfg-color-name').value;
+        const defText = document.getElementById('cfg-color-text').value;
+        const bubHex = document.getElementById('cfg-color-bubble').value;
+        const opacity = clampNumber(document.getElementById('cfg-bubble-opacity').value, 0, 100, 100) / 100;
+        const bubbleRgb = hexToRgb(bubHex) || {r:45,g:20,b:70};
+        const defBubRgba = `rgba(${bubbleRgb.r}, ${bubbleRgb.g}, ${bubbleRgb.b}, ${opacity})`;
+
+        const vipHex = document.getElementById('cfg-color-vip').value;
+        const modHex = document.getElementById('cfg-color-mod').value;
+        const vipRgb = hexToRgb(vipHex) || {r:200,g:100,b:255};
+        const modRgb = hexToRgb(modHex) || {r:135,g:206,b:250};
+
+        const modsArray = document.getElementById('cfg-hauptmods').value
+            .split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+
+        const cmdName = document.getElementById('cfg-cmd-name').value.trim() || "!namefarbe";
+        const cmdBubble = document.getElementById('cfg-cmd-bubble').value.trim() || "!bubblefarbe";
+        const cmdText = document.getElementById('cfg-cmd-text').value.trim() || "!textfarbe";
+        const cmdReset = document.getElementById('cfg-cmd-reset').value.trim() || "!farbenreset";
+        const cmdSniper = document.getElementById('cfg-cmd-sniper').value.trim() || "!del";
+
+        const hidden = document.getElementById('cfg-hidden-cmds').value
+            .split(',').map(s => s.trim()).filter(Boolean);
+        if (document.getElementById('cfg-hide-color-cmds').checked) hidden.push(cmdName, cmdBubble, cmdText, cmdReset);
+        const uniqueHidden = [...new Set(hidden)];
+
+        const diagnostics = document.getElementById('cfg-diagnostics').checked;
+
+        let templateText = document.getElementById('overlay-template').textContent;
+        templateText = templateText.split('</_script>').join('</' + 'script>');
+        templateText = removeOrKeepDebugBlocks(templateText, diagnostics);
+
+        const map = {
+            '[[OVERLAY_VERSION]]': '1.1.1',
+            '[[WS_IP]]': js(wsIp),
+            '[[WS_PORT]]': js(wsPort),
+            '[[SYS_NAME]]': js(sysName),
+            '[[SYS_ACCOUNT]]': js(sysAccount),
+            '[[DAUER]]': String(dauer),
+            '[[RICHTUNG]]': String(richtung),
+            '[[ZEIGE_TWITCH]]': String(twitch),
+            '[[ZEIGE_YOUTUBE]]': String(youtube),
+            '[[HAUPT_MODS]]': js(modsArray),
+            '[[CMD_NAME]]': js(cmdName),
+            '[[CMD_BUBBLE]]': js(cmdBubble),
+            '[[CMD_TEXT]]': js(cmdText),
+            '[[CMD_RESET]]': js(cmdReset),
+            '[[CMD_SNIPER]]': js(cmdSniper),
+            '[[VERSTECKTE_BEFEHLE]]': js(uniqueHidden),
+            '[[ENABLE_GLITTER]]': document.getElementById('cfg-glitter').checked ? 'true' : 'false',
+            '[[DEF_NAME]]': js(defName),
+            '[[DEF_TEXT]]': js(defText),
+            '[[DEF_BUB_HEX]]': js(bubHex),
+            '[[DEF_BUB_RGBA]]': js(defBubRgba),
+            '[[ICON_BROADCASTER]]': js(document.getElementById('cfg-icon-broadcaster').value.trim() || 'isBroadcaster.png'),
+            '[[ICON_HAUPTMOD]]': js(document.getElementById('cfg-icon-hauptmod').value.trim() || 'isMainmod.png'),
+            '[[ICON_MOD]]': js(document.getElementById('cfg-icon-mod').value.trim() || 'isMod.png'),
+            '[[ICON_VIP]]': js(document.getElementById('cfg-icon-vip').value.trim() || 'isVip.png'),
+            '[[VIP_HEX]]': vipHex,
+            '[[MOD_HEX]]': modHex,
+            '[[VIP_RGBA]]': `rgba(${vipRgb.r}, ${vipRgb.g}, ${vipRgb.b}, 0.15)`,
+            '[[MOD_RGBA]]': `rgba(${modRgb.r}, ${modRgb.g}, ${modRgb.b}, 0.2)`,
+            '[[ZEIGE_KANALPUNKTE]]': document.getElementById('cfg-channel-points').checked ? '1' : '0',
+            '[[ZEIGE_ZUSCHAUERSERIEN]]': document.getElementById('cfg-watch-streaks').checked ? '1' : '0',
+            '[[KANALPUNKTE_WAEHRUNG]]': js(document.getElementById('cfg-currency').value.trim() || 'Kanalpunkte'),
+            '[[ZEIGE_KANALPUNKTE_BILD]]': document.getElementById('cfg-coin-gif').checked ? '1' : '0',
+            '[[KANALPUNKTE_BILD_DATEI]]': js(document.getElementById('cfg-coin-gif-file').value.trim() || 'Kanalpunkte.gif'),
+            '[[ZEIGE_SERIEN_COINS]]': document.getElementById('cfg-streak-coins').checked ? '1' : '0',
+            '[[ZEIGE_SERIEN_FEUERWERK]]': document.getElementById('cfg-fireworks').checked ? '1' : '0',
+            '[[SERIEN_FEUERWERK_SOUND]]': document.getElementById('cfg-firework-sound').checked ? '1' : '0',
+            '[[SERIEN_FEUERWERK_LAUTSTAERKE]]': String(clampNumber(document.getElementById('cfg-firework-volume').value, 0, 100, 22) / 100)
+        };
+
+        for (const [key, value] of Object.entries(textValues)) map["[[TEXT_" + key + "]]"] = js(value);
+        templateText = templateText.replace(/\[\[[A-Z0-9_]+\]\]/g, token => {
+            if (!Object.hasOwn(map, token)) throw new Error('Unbekannter Vorlagenwert: ' + token);
+            return map[token];
+        });
+
+        const configBlock = '<script id="einfachnat-overlay-config" type="application/json">' + safeJSON(collectConfig()) + '</' + 'script>';
+        templateText = templateText.replace('</head>', () => configBlock + '\n</head>');
+        const blob = new Blob([templateText], {type:'text/html;charset=utf-8'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = diagnostics ? 'Chat_Diagnose.html' : 'Chat.html';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 500);
+    }
+
+</script>
+
+<script id="overlay-template" type="text/plain">
+<!DOCTYPE html>
+<!--
+    einfachNat Chat Overlay
+    Overlay-Version: [[OVERLAY_VERSION]]
+    Erstellt mit dem einfachNat Chat Overlay Generator
+    https://einfachnat.ch/chat-overlay
+
+    Keine versteckten Tracking- oder Telemetrieanfragen.
+-->
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="generator" content="einfachNat Chat Overlay Generator [[OVERLAY_VERSION]]">
+    <meta name="author" content="einfachNat">
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500&display=swap" rel="stylesheet">
+    <style>
+        /* ==========================================
+           GRUND-DESIGN & VARIABLEN
+           ========================================== */
+        :root {
+            --font-main: 'Kanit', sans-serif;
+            --avatar-side: row; 
+            --direction: column; 
+            --mask-fade: linear-gradient(to bottom, transparent 0%, black 10%, black 100%);
+        }
+
+        body {
+            margin: 0; padding: 28px; overflow: hidden; background-color: transparent; 
+            font-family: var(--font-main); height: 100vh; box-sizing: border-box;
+            display: flex; flex-direction: var(--direction); justify-content: flex-end; 
+            -webkit-mask-image: var(--mask-fade); mask-image: var(--mask-fade);
+        }
+
+        #chat-container { display: flex; flex-direction: var(--direction); gap: 21px; width: 100%; }
+
+        /* ==========================================
+           NACHRICHTEN & CHATBLASEN
+           ========================================== */
+        .message-wrapper {
+            display: flex; flex-direction: var(--avatar-side); align-items: flex-start;
+            justify-content: flex-end; margin-bottom: 0px; max-height: 0; opacity: 0;
+            transform: translateX(56px); 
+            transition: max-height 0.2s ease-out, opacity 0.3s ease-out 0.05s, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.05s;
+            overflow: visible; max-width: 100%; 
+        }
+
+        .message-wrapper.animate-in { max-height: 1100px; opacity: 1; transform: translateX(0); margin-bottom: 21px; }
+        .message-content { margin: 0 17px; display: flex; flex-direction: column; align-items: flex-end; max-width: 75%; min-width: 0; }
+        .username {
+            font-size: 19px; font-weight: 500; margin-bottom: 5px; 
+            text-shadow: 1px 1px 3px rgba(0,0,0,1); max-width: 100%; overflow: hidden;
+            text-overflow: ellipsis; white-space: nowrap;
+        }
+        .bubble {
+            padding: 14px 22px; border-radius: 21px 0px 21px 21px; 
+            font-size: 25px; line-height: 1.4; position: relative;
+            box-shadow: 0 5px 21px rgba(0,0,0,0.4); max-width: 100%; box-sizing: border-box;
+            overflow-wrap: break-word; word-wrap: break-word; word-break: break-word; 
+            transition: transform 0.3s ease-out, opacity 0.3s ease-out, box-shadow 0.3s ease-out;
+        }
+        .chat-emote { height: 35px; vertical-align: middle; margin: -5px 4px; display: inline-block; }
+
+        /* ==========================================
+           PROFILBILDER & ICONS
+           ========================================== */
+        .avatar-container { position: relative; width: 75px; height: 75px; flex-shrink: 0; }
+        .avatar { width: 70px; height: 70px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.2); object-fit: cover; background-color: #222; }
+        .platform-icon {
+            position: absolute; top: -3px; right: -3px; width: 25px; height: 25px; background: white;
+            border-radius: 50%; padding: 3px; box-shadow: 0 3px 6px rgba(0,0,0,0.3); z-index: 5;
+        }
+        .role-badge {
+            position: absolute; bottom: -5px; right: -5px; width: 35px; height: 35px; 
+            filter: drop-shadow(0 3px 3px rgba(0,0,0,0.5)); z-index: 5; border-radius: 50%; 
+        }
+
+        /* ==========================================
+           GLITZER EFFEKTE (VIP & MOD)
+           ========================================== */
+        .vip-glitter .avatar { animation: vip-glow 2s ease-in-out; }
+        .vip-glitter .avatar-container::after {
+            content: ''; position: absolute; top: -21px; left: -21px; right: -21px; bottom: -21px; 
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, [[VIP_RGBA]] 40%, transparent 70%);
+            animation: vip-burst 2s ease-in-out forwards; pointer-events: none; z-index: 10;
+        }
+        @keyframes vip-glow {
+            0% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(255, 105, 180, 0)); border-color: rgba(255,255,255,0.2); }
+            50% { transform: scale(1.02); filter: drop-shadow(0 0 7px [[VIP_HEX]]); border-color: [[VIP_HEX]]; } 
+            100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(255, 105, 180, 0)); border-color: rgba(255,255,255,0.2); }
+        }
+        @keyframes vip-burst { 0% { transform: scale(0.5); opacity: 0; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1.8); opacity: 0; } }
+
+        .mod-glitter .avatar { animation: mod-glow 2s ease-in-out; }
+        .mod-glitter .avatar-container::after {
+            content: ''; position: absolute; top: -21px; left: -21px; right: -21px; bottom: -21px; 
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, [[MOD_RGBA]] 40%, transparent 70%);
+            animation: mod-burst 2s ease-in-out forwards; pointer-events: none; z-index: 10;
+        }
+        @keyframes mod-glow {
+            0% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(135, 206, 250, 0)); border-color: rgba(255,255,255,0.2); }
+            50% { transform: scale(1.02); filter: drop-shadow(0 0 7px [[MOD_HEX]]); border-color: [[MOD_HEX]]; } 
+            100% { transform: scale(1); filter: drop-shadow(0 0 0px rgba(135, 206, 250, 0)); border-color: rgba(255,255,255,0.2); }
+        }
+        @keyframes mod-burst { 0% { transform: scale(0.5); opacity: 0; } 50% { transform: scale(1.2); opacity: 1; } 100% { transform: scale(1.8); opacity: 0; } }
+
+        /* ==========================================
+           LÖSCH- UND FADE-ANIMATIONEN
+           ========================================== */
+        .fade-out {
+            opacity: 0 !important; transform: scale(0.9) translateX(-28px) !important; 
+            max-height: 0 !important; margin-bottom: 0 !important; transition: all 0.5s ease-out !important;
+        }
+        
+        @keyframes explode-animation {
+            0% { transform: scale(1) rotate(0deg); opacity: 1; filter: blur(0px); box-shadow: 0 0 0 rgba(255, 100, 0, 0); }
+            20% { transform: scale(1.3) rotate(5deg); opacity: 1; filter: blur(1px); box-shadow: 0 0 42px rgba(255, 100, 0, 0.8); } 
+            100% { transform: scale(2.5) rotate(-15deg); opacity: 0; filter: blur(21px); box-shadow: 0 0 140px rgba(255, 50, 0, 0); } 
+        }
+        .explode { pointer-events: none; overflow: visible !important; }
+        .explode .bubble, .explode .avatar-container { animation: explode-animation 0.5s ease-out forwards; }
+        .explode .username { opacity: 0; transition: opacity 0.2s ease-out; }
+        .message-wrapper.explode { max-height: 0 !important; margin-bottom: 0 !important; transition: all 0.5s ease-out 0.3s !important; }
+        
+        /* --- SYSTEM NACHRICHTEN DESIGNS --- */
+        .system-msg .bubble { background: rgba(30, 150, 50, 0.85) !important; color: white !important; }
+        .error-msg .bubble { 
+            background: rgba(180, 20, 40, 0.95) !important; 
+            color: white !important; 
+            border: 2px solid #ff6666; 
+            box-shadow: 0 5px 25px rgba(180, 20, 40, 0.5); 
+        }
+
+        /* ==========================================
+           AFFILIATE EVENTS: COINS, STREAKS, DEBUG
+           ========================================== */
+        #fireworks-layer {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        #chat-container {
+            position: relative;
+            z-index: 2;
+        }
+
+        .affiliate-event .bubble {
+            border: 2px solid rgba(255, 215, 100, 0.65);
+            box-shadow:
+                0 5px 21px rgba(0,0,0,0.4),
+                0 0 18px rgba(255, 215, 100, 0.18);
+        }
+
+        .watch-streak .bubble {
+            background:
+                linear-gradient(135deg, rgba(62, 22, 92, 0.96), rgba(45, 20, 70, 0.96)) !important;
+        }
+
+        .reward-redemption .bubble {
+            background:
+                linear-gradient(135deg, rgba(65, 34, 20, 0.96), rgba(45, 20, 70, 0.96)) !important;
+        }
+
+        .currency-rainbow {
+            font-weight: 500;
+            background: linear-gradient(
+                90deg,
+                #ff5f6d,
+                #ffc371,
+                #fff36d,
+                #71ff9b,
+                #6dcfff,
+                #b56dff,
+                #ff6dd8,
+                #ff5f6d
+            );
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: currency-rainbow-move 3s linear infinite;
+            filter: drop-shadow(0 0 4px rgba(255,255,255,0.24));
+        }
+
+        @keyframes currency-rainbow-move {
+            0%   { background-position: 0% 50%; }
+            100% { background-position: 300% 50%; }
+        }
+
+        .event-input {
+            display: block;
+            margin-top: 9px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255,255,255,0.22);
+            font-size: 0.90em;
+            font-style: italic;
+        }
+
+        .reward-emote {
+            height: 42px;
+            width: 42px;
+            object-fit: contain;
+            vertical-align: middle;
+            margin: -7px 8px -7px 0;
+            filter: drop-shadow(0 0 5px rgba(255,255,255,0.28));
+        }
+
+        .coin-image {
+            height: 46px;
+            width: 46px;
+            object-fit: contain;
+            vertical-align: middle;
+            margin: -8px 8px -8px 0;
+            filter: drop-shadow(0 0 6px rgba(255, 210, 80, 0.45));
+        }
+
+        .milestone-streak .bubble {
+            animation: milestone-pop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-color: rgba(255, 235, 145, 0.95);
+            box-shadow:
+                0 5px 21px rgba(0,0,0,0.4),
+                0 0 28px rgba(255, 220, 90, 0.35);
+        }
+
+        @keyframes milestone-pop {
+            0%   { transform: scale(0.86); }
+            60%  { transform: scale(1.045); }
+            100% { transform: scale(1); }
+        }
+
+        /* DEBUG_ONLY_START */
+        #debug-panel {
+            position: fixed;
+            left: 12px;
+            top: 12px;
+            z-index: 9999;
+            width: 310px;
+            padding: 12px;
+            border-radius: 12px;
+            background: rgba(12, 8, 20, 0.94);
+            border: 1px solid rgba(255,255,255,0.25);
+            box-shadow: 0 8px 28px rgba(0,0,0,0.5);
+            color: #fff;
+            font-family: var(--font-main);
+            font-size: 13px;
+            -webkit-mask-image: none;
+            mask-image: none;
+        }
+
+        #debug-panel .debug-title {
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        #debug-panel .debug-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 7px;
+        }
+
+        #debug-panel button {
+            cursor: pointer;
+            padding: 6px 9px;
+            border: 1px solid rgba(255,255,255,0.24);
+            border-radius: 8px;
+            background: #442060;
+            color: white;
+            font-family: inherit;
+        }
+
+        #debug-panel button:hover {
+            background: #63308a;
+        }
+
+        #debug-panel .debug-hint {
+            opacity: 0.72;
+            margin-top: 8px;
+            line-height: 1.3;
+        }
+
+        #event-debug-panel {
+            position: fixed;
+            left: 12px;
+            bottom: 12px;
+            z-index: 9998;
+            width: min(760px, calc(100vw - 24px));
+            max-height: 46vh;
+            overflow: auto;
+            padding: 12px;
+            border-radius: 12px;
+            background: rgba(7, 6, 12, 0.96);
+            border: 1px solid rgba(255,255,255,0.22);
+            box-shadow: 0 8px 28px rgba(0,0,0,0.55);
+            color: #fff;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+            line-height: 1.35;
+            -webkit-mask-image: none;
+            mask-image: none;
+        }
+
+        #event-debug-panel .event-debug-title {
+            font-family: var(--font-main);
+            font-size: 15px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        #event-debug-panel .event-debug-summary {
+            margin-bottom: 8px;
+            padding: 8px;
+            border-radius: 8px;
+            background: rgba(90, 44, 126, 0.28);
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        #event-debug-panel pre {
+            margin: 0;
+            padding: 8px;
+            border-radius: 8px;
+            background: rgba(255,255,255,0.05);
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            tab-size: 2;
+        }
+
+        #event-debug-panel .event-debug-note {
+            opacity: 0.72;
+            margin-top: 8px;
+            font-family: var(--font-main);
+        }
+        /* DEBUG_ONLY_END */
+
+    </style>
+</head>
+<body data-overlay-generator="einfachNat" data-overlay-version="[[OVERLAY_VERSION]]">
+    <canvas id="fireworks-layer"></canvas>
+    <div id="chat-container"></div>
+    <script>
+        // ==========================================
+        //         DEINE STEUERZENTRALE
+        // ==========================================
+        const OVERLAY_INFO = Object.freeze({
+            generator: "einfachNat Chat Overlay Generator",
+            version: "[[OVERLAY_VERSION]]",
+            source: "https://einfachnat.ch/chat-overlay"
+        });
+        console.info(`%ceinfachNat Chat Overlay ${OVERLAY_INFO.version}`, "color:#b985f5;font-weight:bold");
+
+        
+        // --- WEBSOCKET EINSTELLUNGEN ---
+        const WS_IP = [[WS_IP]];
+        const WS_PORT = [[WS_PORT]];
+
+        // --- ALLGEMEINE EINSTELLUNGEN ---
+        // Sichtdauer einer normalen Chatnachricht in SEKUNDEN.
+        // 45 = Nachricht verschwindet nach 45 Sekunden.
+        // 0  = Nachricht bleibt dauerhaft stehen, bis sie anderweitig entfernt wird.
+        const DAUER = [[DAUER]];
+
+        // Vertikale Reihenfolge des Chats – NICHT links/rechts!
+        // 1 = neue Nachrichten erscheinen UNTEN; ältere Nachrichten wandern nach OBEN.
+        // 2 = neue Nachrichten erscheinen OBEN; ältere Nachrichten wandern nach UNTEN.
+        // Die horizontale Ausrichtung (aktuell rechts) wird separat über das CSS gesteuert.
+        const RICHTUNG = [[RICHTUNG]];
+
+        // Plattformen ein-/ausblenden: 1 = anzeigen, 0 = ausblenden.
+        const ZEIGE_TWITCH = [[ZEIGE_TWITCH]];
+        const ZEIGE_YOUTUBE = [[ZEIGE_YOUTUBE]]; 
+        
+        const HAUPT_MODS = [[HAUPT_MODS]]; 
+
+        // --- SYSTEM-ACCOUNT ---
+        const SYSTEM_NAME = [[SYS_NAME]];
+        const SYSTEM_TWITCH_LOGIN = [[SYS_ACCOUNT]];
+
+        // --- CHATBEFEHLE ---
+        const CMD_NAME = [[CMD_NAME]]; 
+        const CMD_BUBBLE = [[CMD_BUBBLE]]; 
+        const CMD_TEXT = [[CMD_TEXT]]; 
+        const CMD_RESET = [[CMD_RESET]];
+        
+        // Erweiterter Sniper-Befehl (Beispiele: !del @user, !del user 4, !del 4)
+        const CMD_SNIPER = [[CMD_SNIPER]]; 
+
+        const VERSTECKTE_BEFEHLE = [[VERSTECKTE_BEFEHLE]]; 
+        
+        const ENABLE_GLITTER = [[ENABLE_GLITTER]];
+
+        const DEF_NAME = [[DEF_NAME]]; 
+        const DEF_TEXT = [[DEF_TEXT]]; 
+        const DEF_BUB_HEX = [[DEF_BUB_HEX]]; 
+        const DEF_BUB_RGBA = [[DEF_BUB_RGBA]]; 
+
+        const ICON_BROADCASTER_FILE = [[ICON_BROADCASTER]];
+        const ICON_MOD_FILE = [[ICON_MOD]];
+        const ICON_VIP_FILE = [[ICON_VIP]];
+        const ICON_HAUPTMOD_FILE = [[ICON_HAUPTMOD]];
+
+        const ICON_BROADCASTER = `<img class="role-badge" src="${escapeHTML(ICON_BROADCASTER_FILE)}" onerror="this.remove()">`;
+        const ICON_MOD = `<img class="role-badge" src="${escapeHTML(ICON_MOD_FILE)}" onerror="this.remove()">`;
+        const ICON_VIP = `<img class="role-badge" src="${escapeHTML(ICON_VIP_FILE)}" onerror="this.remove()">`;
+        const ICON_HAUPTMOD = `<img class="role-badge" src="${escapeHTML(ICON_HAUPTMOD_FILE)}" onerror="if(this.dataset.fallback){this.remove();}else{this.dataset.fallback='1';this.src=ICON_MOD_FILE;}">`;
+        
+
+        // ==========================================
+        //      AFFILIATE-FEATURES / EVENTS
+        // ==========================================
+        // 1 = an, 0 = aus
+        const ZEIGE_KANALPUNKTE = [[ZEIGE_KANALPUNKTE]];
+        const ZEIGE_ZUSCHAUERSERIEN = [[ZEIGE_ZUSCHAUERSERIEN]];
+
+        // Angezeigter Name deiner Kanalpunkte.
+        // In SYSTEM-Nachrichten wird {currency} automatisch mit Regenbogeneffekt dargestellt.
+        const KANALPUNKTE_WAEHRUNG = [[KANALPUNKTE_WAEHRUNG]];
+
+        // Optionales Kanalpunkte-Bild. Unterstützt werden alle üblichen Browser-Bildformate,
+        // z. B. GIF, PNG, JPG/JPEG und WebP. Die Datei muss im selben Ordner liegen.
+        const ZEIGE_KANALPUNKTE_BILD = [[ZEIGE_KANALPUNKTE_BILD]];
+        const KANALPUNKTE_BILD_DATEI = [[KANALPUNKTE_BILD_DATEI]];
+
+        // Watch-Streak Extras – jeweils 1 = an, 0 = aus.
+        const ZEIGE_SERIEN_COINS = [[ZEIGE_SERIEN_COINS]];       // Von Twitch vergebene Kanalpunkte erwähnen
+        const ZEIGE_SERIEN_FEUERWERK = [[ZEIGE_SERIEN_FEUERWERK]];  // Optisches Feuerwerk hinter dem Chat
+        const SERIEN_FEUERWERK_SOUND = [[SERIEN_FEUERWERK_SOUND]];  // Akustischen Feuerwerkseffekt abspielen
+
+        // Lautstärke: 0.0 = stumm, 1.0 = volle Lautstärke.
+        const SERIEN_FEUERWERK_LAUTSTAERKE = [[SERIEN_FEUERWERK_LAUTSTAERKE]];
+
+        // Dauer des optischen Feuerwerks in Millisekunden.
+        // 2200 = 2.2 Sekunden.
+        const SERIEN_FEUERWERK_DAUER_MS = 2200;
+
+        /* DEBUG_ONLY_START */
+        // Debug: 1 zeigt im Overlay das Testpanel, 0 blendet es aus.
+        // Alternativ funktioniert ?debug=1 in der URL, z.B.:
+        // file:///C:/Stream/Chat/Chat.html?debug=1
+        // WICHTIG: Wenn OBS die Quelle über "Lokale Datei" lädt, lässt sich dort
+        // normalerweise kein ?debug=1 anhängen. Dann einfach DEBUG_MODUS = 1 verwenden.
+        const DEBUG_MODUS = 1;
+
+        // Schreibt echte Streamer.bot-Events in die Browser-Konsole.
+        // Nur zur Fehlersuche auf 1 stellen.
+        const DEBUG_EVENT_DATEN = 0;
+        /* DEBUG_ONLY_END */
+
+        // Verhindert, dass eine Kanalpunkte-Eingabe zusätzlich als normale
+        // Twitch-Chatnachricht ein zweites Mal im Overlay erscheint.
+        const VERSTECKE_CUSTOM_REWARD_CHAT = 1;
+
+        // ==========================================
+        //           KANALPUNKTE-TEXTE
+        // ==========================================
+        const KANALPUNKTE_TEXTE = [[TEXT_KANALPUNKTE_TEXTE]];
+
+        const KANALPUNKTE_INPUT_TEXTE = [[TEXT_KANALPUNKTE_INPUT_TEXTE]];
+
+        // Twitch-Standardbelohnungen, z.B. Emote freischalten / Nachricht hervorheben.
+        // Diese kommen als "AutomaticRewardRedemption" und nicht zwingend als normale Custom Reward.
+        const AUTOMATISCHE_REWARD_TEXTE = [[TEXT_AUTOMATISCHE_REWARD_TEXTE]];
+
+        // ==========================================
+        //          ZUSCHAUERSERIEN-TEXTE
+        // ==========================================
+        // Grundbereiche:
+        //   SERIE_KLEIN      = 2–4 Streams in Folge
+        //   SERIE_MITTEL     = 5–9 Streams in Folge
+        //   SERIE_GROSS      = 10–24 Streams in Folge
+        //   SERIE_EXTREM     = 25–49 Streams in Folge
+        //   SERIE_LEGENDAER  = ab 50 Streams in Folge
+        //
+        // WICHTIG:
+        // Für exakt 5, 10, 25, 50 und 100 Streams haben die Texte unter
+        // SERIE_MEILENSTEINE Vorrang. Die jeweilige normale Liste wird
+        // bei diesen exakten Zahlen also nicht benutzt.
+        //
+        // Du kannst in jeder Liste beliebig Texte hinzufügen oder löschen.
+        // Verfügbare Platzhalter sind insbesondere {user} und {streak}.
+        const SERIE_KLEIN = [[TEXT_SERIE_KLEIN]];
+
+        const SERIE_MITTEL = [[TEXT_SERIE_MITTEL]];
+
+        const SERIE_GROSS = [[TEXT_SERIE_GROSS]];
+
+        const SERIE_EXTREM = [[TEXT_SERIE_EXTREM]];
+
+        const SERIE_LEGENDAER = [[TEXT_SERIE_LEGENDAER]];
+
+        // Spezielle Texte für exakte Meilensteine.
+        // Diese haben Vorrang vor KLEIN / MITTEL / GROSS / EXTREM / LEGENDAER.
+        const SERIE_MEILENSTEINE = [[TEXT_SERIE_MEILENSTEINE]];
+
+        const SERIE_COIN_TEXTE = [[TEXT_SERIE_COIN_TEXTE]];
+
+        const SERIE_INPUT_TEXTE = [[TEXT_SERIE_INPUT_TEXTE]];
+
+
+        // ==========================================
+        //               ENDE STEUERZENTRALE
+        // ==========================================
+
+        if (RICHTUNG === 2) { 
+            document.documentElement.style.setProperty('--direction', 'column-reverse'); 
+            document.body.style.justifyContent = 'flex-start'; 
+            document.documentElement.style.setProperty('--mask-fade', 'linear-gradient(to top, transparent 0%, black 10%, black 100%)'); 
+        } else { 
+            document.documentElement.style.setProperty('--direction', 'column'); 
+            document.body.style.justifyContent = 'flex-end'; 
+            document.documentElement.style.setProperty('--mask-fade', 'linear-gradient(to bottom, transparent 0%, black 10%, black 100%)'); 
+        }
+
+        const avatarCache = JSON.parse(localStorage.getItem('twitch_avatars') || '{}'); 
+        const userColorsCache = JSON.parse(localStorage.getItem('twitch_user_colors') || '{}'); 
+        const CACHE_TIME = 24 * 60 * 60 * 1000; 
+
+        function saveUserColor(login, type, hex) { 
+            if (!userColorsCache[login]) userColorsCache[login] = {}; 
+            userColorsCache[login][type] = hex; 
+            localStorage.setItem('twitch_user_colors', JSON.stringify(userColorsCache)); 
+        }
+
+        function getLuminance(r, g, b) { 
+            let a = [r, g, b].map(function (v) { 
+                v /= 255; 
+                return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); 
+            }); 
+            return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722; 
+        }
+
+        function hexToRgb(hex) { 
+            let shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i; 
+            hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b); 
+            let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex); 
+            return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : null; 
+        }
+
+        function calculateContrast(hex1, hex2) { 
+            let rgb1 = hexToRgb(hex1); 
+            let rgb2 = hexToRgb(hex2); 
+            if(!rgb1 || !rgb2) return 5; 
+            let lum1 = getLuminance(rgb1.r, rgb1.g, rgb1.b); 
+            let lum2 = getLuminance(rgb2.r, rgb2.g, rgb2.b); 
+            let brightest = Math.max(lum1, lum2); 
+            let darkest = Math.min(lum1, lum2); 
+            return (brightest + 0.05) / (darkest + 0.05); 
+        }
+
+        async function getTwitchAvatarUrl(loginName, displayName) { 
+            const lowerLogin = loginName.toLowerCase(); 
+            const now = Date.now(); 
+            
+            if (avatarCache[lowerLogin] && (now - avatarCache[lowerLogin].timestamp < CACHE_TIME)) {
+                return avatarCache[lowerLogin].url; 
+            }
+            
+            try { 
+                const controller = new AbortController(); 
+                const timeoutId = setTimeout(() => controller.abort(), 2000); 
+                const response = await fetch(`https://decapi.me/twitch/avatar/${lowerLogin}`, { signal: controller.signal }); 
+                clearTimeout(timeoutId); 
+                
+                const url = await response.text(); 
+                if (url && url.startsWith('http')) { 
+                    avatarCache[lowerLogin] = { url: url, timestamp: now }; 
+                    localStorage.setItem('twitch_avatars', JSON.stringify(avatarCache)); 
+                    return url; 
+                } 
+            } catch (error) {} 
+            
+            return `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=random&color=fff`; 
+        }
+
+        function escapeHTML(str) { 
+            return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)); 
+        }
+
+        function formatEmotes(text, emotes) { 
+            if (!emotes || emotes.length === 0) return escapeHTML(text); 
+            
+            emotes.sort((a, b) => b.name.length - a.name.length); 
+            let htmlMap = []; 
+            
+            emotes.forEach((emote, index) => { 
+                let url = emote.imageUrl || `https://static-cdn.jtvnw.net/emoticons/v2/${emote.id}/default/dark/2.0`; 
+                let emoteHtml = `<img class="chat-emote" src="${url}" alt="${emote.name}">`; 
+                htmlMap.push(emoteHtml); 
+                
+                let safeName = emote.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); 
+                let regex; 
+                if (/^\w/.test(emote.name) && /\w$/.test(emote.name)) regex = new RegExp(`\\b${safeName}\\b`, 'g'); 
+                else regex = new RegExp(safeName, 'g'); 
+                
+                text = text.replace(regex, `__EMOTE_TOKEN_${index}__`); 
+            }); 
+            
+            text = escapeHTML(text); 
+            
+            htmlMap.forEach((html, index) => { 
+                let regex = new RegExp(`__EMOTE_TOKEN_${index}__`, 'g'); 
+                text = text.replace(regex, html); 
+            }); 
+            return text; 
+        }
+
+        function escapeRegExp(string) { return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+        const safeCmdName = escapeRegExp(CMD_NAME); 
+        const safeCmdBubble = escapeRegExp(CMD_BUBBLE); 
+        const safeCmdText = escapeRegExp(CMD_TEXT); 
+        const safeCmdReset = escapeRegExp(CMD_RESET);
+        
+        const colorCmdStartRegex = new RegExp("^(" + safeCmdName + "|" + safeCmdBubble + "|" + safeCmdText + "|" + safeCmdReset + ")\\b", "i");
+        const colorCmdFullRegex = new RegExp("^(" + safeCmdName + "|" + safeCmdBubble + "|" + safeCmdText + "|" + safeCmdReset + ")\\s*(#?[0-9A-Fa-f]{6}|#?[0-9A-Fa-f]{3})?", "i");
+
+
+        // ==========================================
+        //   AFFILIATE-EVENT HELFER & TEXT-ENGINE
+        // ==========================================
+        const recentTemplateIndices = new Map();
+
+        function pickRandomNoRepeat(key, arr, memory = 3) {
+            if (!Array.isArray(arr) || arr.length === 0) return "";
+            let history = recentTemplateIndices.get(key) || [];
+            let candidates = arr.map((_, i) => i).filter(i => !history.includes(i));
+            if (candidates.length === 0) candidates = arr.map((_, i) => i);
+            const index = candidates[Math.floor(Math.random() * candidates.length)];
+            history.push(index);
+            while (history.length > Math.min(memory, Math.max(0, arr.length - 1))) history.shift();
+            recentTemplateIndices.set(key, history);
+            return arr[index];
+        }
+
+        function replaceTemplate(template, values) {
+            return String(template || "").replace(/\{(\w+)\}/g, (_, key) =>
+                values[key] !== undefined && values[key] !== null ? String(values[key]) : ""
+            );
+        }
+
+        function currencyHTML() {
+            return `<span class="currency-rainbow">${escapeHTML(KANALPUNKTE_WAEHRUNG)}</span>`;
+        }
+
+        function formatEventTemplate(template, values = {}) {
+            const marker = "__CURRENCY_MARKER__";
+            const safeValues = {};
+            for (const [key, value] of Object.entries(values)) {
+                safeValues[key] = escapeHTML(String(value ?? ""));
+            }
+            safeValues.currency = marker;
+
+            let result = replaceTemplate(template, safeValues);
+            result = result.split(marker).join(currencyHTML());
+            return result;
+        }
+
+        function getStreakPool(streak) {
+            if (SERIE_MEILENSTEINE[streak]) return { key: `milestone-${streak}`, pool: SERIE_MEILENSTEINE[streak], milestone: true };
+            if (streak <= 4) return { key: "streak-small", pool: SERIE_KLEIN, milestone: false };
+            if (streak <= 9) return { key: "streak-medium", pool: SERIE_MITTEL, milestone: false };
+            if (streak <= 24) return { key: "streak-large", pool: SERIE_GROSS, milestone: false };
+            if (streak <= 49) return { key: "streak-extreme", pool: SERIE_EXTREM, milestone: false };
+            return { key: "streak-legendary", pool: SERIE_LEGENDAER, milestone: streak === 50 || streak === 100 };
+        }
+
+        function resolveEventUser(data = {}) {
+            // Streamer.bot kann je nach Event / EventSub-Pfad camelCase ODER
+            // rohe Twitch-Felder in snake_case liefern. Beides wird unterstützt.
+
+            const nestedUser =
+                data.user ||
+                data.chatter ||
+                data.redeemer ||
+                data.eventUser ||
+                data.event_user ||
+                null;
+
+            const broadcaster =
+                data.broadcaster ||
+                data.channel ||
+                null;
+
+            const nestedName =
+                nestedUser && (
+                    nestedUser.displayName ||
+                    nestedUser.display_name ||
+                    nestedUser.name ||
+                    nestedUser.userName ||
+                    nestedUser.user_name ||
+                    nestedUser.username ||
+                    nestedUser.login
+                );
+
+            const nestedLogin =
+                nestedUser && (
+                    nestedUser.login ||
+                    nestedUser.userLogin ||
+                    nestedUser.user_login ||
+                    nestedUser.username ||
+                    nestedUser.name
+                );
+
+            const broadcasterName =
+                broadcaster && (
+                    broadcaster.displayName ||
+                    broadcaster.display_name ||
+                    broadcaster.name ||
+                    broadcaster.login
+                );
+
+            const broadcasterLogin =
+                broadcaster && (
+                    broadcaster.login ||
+                    broadcaster.name
+                );
+
+            const userName =
+                nestedName ||
+                data.userDisplayName ||
+                data.user_display_name ||
+                data.displayName ||
+                data.display_name ||
+                data.userName ||
+                data.user_name ||
+                data.username ||
+                data.userLogin ||
+                data.user_login ||
+                data.login ||
+                broadcasterName ||
+                data.broadcaster_user_name ||
+                data.broadcasterUserName ||
+                data.broadcaster_user_login ||
+                data.broadcasterUserLogin ||
+                "Twitch User";
+
+            const login =
+                nestedLogin ||
+                data.userLogin ||
+                data.user_login ||
+                data.login ||
+                data.username ||
+                data.userName ||
+                data.user_name ||
+                broadcasterLogin ||
+                data.broadcaster_user_login ||
+                data.broadcasterUserLogin ||
+                data.broadcaster_user_name ||
+                data.broadcasterUserName ||
+                userName;
+
+            const imageUrl =
+                (nestedUser && (
+                    nestedUser.imageUrl ||
+                    nestedUser.image_url ||
+                    nestedUser.profileImageUrl ||
+                    nestedUser.profile_image_url
+                )) ||
+                data.userImageUrl ||
+                data.user_image_url ||
+                data.profileImageUrl ||
+                data.profile_image_url ||
+                "";
+
+            return {
+                raw: nestedUser || broadcaster || {},
+                actualUserWasMissing: !nestedUser &&
+                    !data.user_login &&
+                    !data.userLogin &&
+                    !data.user_name &&
+                    !data.userName,
+                usedBroadcasterFallback:
+                    !nestedUser &&
+                    !data.user_login &&
+                    !data.userLogin &&
+                    !data.user_name &&
+                    !data.userName &&
+                    !!(
+                        broadcaster ||
+                        data.broadcaster_user_login ||
+                        data.broadcasterUserLogin ||
+                        data.broadcaster_user_name ||
+                        data.broadcasterUserName
+                    ),
+                name: String(userName || "Twitch User"),
+                login: String(login || userName || "TwitchUser").toLowerCase(),
+                imageUrl: String(imageUrl || "")
+            };
+        }
+
+        async function getEventAvatar(userInfo) {
+            if (userInfo && userInfo.imageUrl && userInfo.imageUrl.startsWith("http")) {
+                return userInfo.imageUrl;
+            }
+
+            const login = (userInfo && userInfo.login) || "TwitchUser";
+            const name = (userInfo && userInfo.name) || login || "Twitch User";
+            return await getTwitchAvatarUrl(login, name);
+        }
+
+        function parseRoleBadges(user) {
+            const badges = user && Array.isArray(user.badges) ? user.badges : [];
+            return {
+                broadcaster: badges.some(b => b.name === "broadcaster"),
+                moderator: badges.some(b => b.name === "moderator"),
+                vip: badges.some(b => b.name === "vip")
+            };
+        }
+
+        async function showRewardRedemption(data, fromDebug = false) {
+            if (!ZEIGE_KANALPUNKTE) return;
+
+            const userInfo = resolveEventUser(data);
+            const user = userInfo.raw || {};
+            const reward = data.reward || {};
+
+            const userName = userInfo.name;
+            const login = userInfo.login;
+
+                /* DEBUG_ONLY_START */
+            if (DEBUG_EVENT_DATEN === 1 && userInfo.actualUserWasMissing) {
+                console.warn("[Overlay] Reward ohne data.user empfangen. Broadcaster-Fallback:", userInfo, data);
+            }
+            /* DEBUG_ONLY_END */
+
+            const cost = Number(
+                reward.cost ??
+                data.rewardCost ??
+                data.cost ??
+                0
+            );
+
+            const rewardTitle =
+                reward.title ||
+                reward.name ||
+                data.rewardName ||
+                data.rewardTitle ||
+                "Kanalpunktebelohnung";
+
+            const input = String(
+                data.userInput ??
+                data.user_input ??
+                data.rawInput ??
+                data.raw_input ??
+                data.text ??
+                ""
+            ).trim();
+
+            const baseTemplate = pickRandomNoRepeat("reward-main", KANALPUNKTE_TEXTE, 3);
+            let html = formatEventTemplate(baseTemplate, {
+                user: userName,
+                reward: rewardTitle,
+                cost: cost.toLocaleString("de-CH")
+            });
+
+            if (ZEIGE_KANALPUNKTE_BILD) {
+                html =
+                    `<img class="coin-image" src="${escapeHTML(KANALPUNKTE_BILD_DATEI)}" onerror="this.remove()">`
+                    + html;
+            }
+
+            if (input) {
+                const inputTemplate = pickRandomNoRepeat(
+                    "reward-input",
+                    KANALPUNKTE_INPUT_TEXTE,
+                    2
+                );
+
+                html += `<span class="event-input">${formatEventTemplate(inputTemplate, {
+                    user: userName,
+                    input: input
+                })}</span>`;
+            }
+
+            const avatar = await getEventAvatar(userInfo);
+            const roles = parseRoleBadges(user);
+            const id =
+                `reward-${data.redemptionId || data.id || Date.now()}-${Math.floor(Math.random() * 10000)}`;
+
+            addMessageToUI(
+                id,
+                userName,
+                html,
+                false,
+                avatar,
+                roles.broadcaster,
+                roles.moderator,
+                roles.vip,
+                login,
+                false,
+                false,
+                "affiliate-event reward-redemption"
+            );
+        }
+
+        function prettifyAutomaticRewardType(type) {
+            const key = String(type || "").trim().toLowerCase();
+
+            const names = {
+                "send_highlighted_message": "Nachricht hervorheben",
+                "single_message_bypass_sub_mode": "Nachricht trotz Sub-Modus",
+                "random_sub_emote_unlock": "Zufälliges Emote freischalten",
+                "chosen_sub_emote_unlock": "Emote freischalten",
+                "chosen_modified_sub_emote_unlock": "Modifiziertes Emote freischalten"
+            };
+
+            if (names[key]) return names[key];
+
+            if (!key) return "Twitch-Belohnung";
+
+            return key
+                .replace(/[_-]+/g, " ")
+                .replace(/\b\w/g, c => c.toUpperCase());
+        }
+
+        async function showAutomaticRewardRedemption(data, fromDebug = false) {
+            if (!ZEIGE_KANALPUNKTE) return;
+
+            const userInfo = resolveEventUser(data);
+            const user = userInfo.raw || {};
+            const userName = userInfo.name;
+            const login = userInfo.login;
+
+            const cost = Math.max(0, Number(
+                data.channelPoints ??
+                data.channel_points ??
+                data.rewardCost ??
+                data.reward_cost ??
+                data.cost ??
+                0
+            ));
+
+            const unlockedEmote = data.unlockedEmote || data.unlocked_emote || {};
+            const rewardTitle =
+                unlockedEmote.text ||
+                unlockedEmote.name ||
+                data.rewardName ||
+                data.reward_name ||
+                data.rewardTitle ||
+                data.reward_title ||
+                prettifyAutomaticRewardType(data.rewardType || data.reward_type);
+
+            const input = String(
+                data.text ??
+                data.userInput ??
+                data.user_input ??
+                data.rawInput ??
+                data.raw_input ??
+                ""
+            ).trim();
+
+            const baseTemplate = pickRandomNoRepeat(
+                "automatic-reward-main",
+                AUTOMATISCHE_REWARD_TEXTE,
+                3
+            );
+
+            let html = formatEventTemplate(baseTemplate, {
+                user: userName,
+                reward: rewardTitle,
+                cost: cost.toLocaleString("de-CH")
+            });
+
+            // Falls Twitch ein freigeschaltetes Emote mitsendet, zeigen wir es klein mit an.
+            if (unlockedEmote.imageUrl && String(unlockedEmote.imageUrl).startsWith("http")) {
+                html =
+                    `<img class="reward-emote" src="${escapeHTML(unlockedEmote.imageUrl)}" onerror="this.remove()">`
+                    + html;
+            } else if (ZEIGE_KANALPUNKTE_BILD) {
+                html =
+                    `<img class="coin-image" src="${escapeHTML(KANALPUNKTE_BILD_DATEI)}" onerror="this.remove()">`
+                    + html;
+            }
+
+            if (input) {
+                const inputTemplate = pickRandomNoRepeat(
+                    "automatic-reward-input",
+                    KANALPUNKTE_INPUT_TEXTE,
+                    2
+                );
+
+                html += `<span class="event-input">${formatEventTemplate(inputTemplate, {
+                    user: userName,
+                    input: input
+                })}</span>`;
+            }
+
+            const avatar = await getEventAvatar(userInfo);
+            const roles = parseRoleBadges(user);
+
+            const id =
+                `auto-reward-${data.id || data.redemptionId || Date.now()}-${Math.floor(Math.random() * 10000)}`;
+
+            addMessageToUI(
+                id,
+                userName,
+                html,
+                false,
+                avatar,
+                roles.broadcaster,
+                roles.moderator,
+                roles.vip,
+                login,
+                false,
+                false,
+                "affiliate-event reward-redemption automatic-reward"
+            );
+        }
+
+        async function showWatchStreak(data, fromDebug = false) {
+            if (!ZEIGE_ZUSCHAUERSERIEN) return;
+
+            const userInfo = resolveEventUser(data);
+            const user = userInfo.raw || {};
+            const userName = userInfo.name;
+            const login = userInfo.login;
+            const streak = Math.max(1, Number(
+                data.streakCount ??
+                data.streak_count ??
+                data.watchStreak ??
+                data.watch_streak ??
+                1
+            ));
+
+            const coins = Math.max(0, Number(
+                data.channelPointsAwarded ??
+                data.channel_points_awarded ??
+                data.channelPoints ??
+                data.channel_points ??
+                0
+            ));
+
+            const input = String(
+                data.text ??
+                data.userInput ??
+                data.user_input ??
+                ""
+            ).trim();
+
+            const selection = getStreakPool(streak);
+            const streakTemplate = pickRandomNoRepeat(selection.key, selection.pool, 3);
+
+            let html = formatEventTemplate(streakTemplate, {
+                user: userName,
+                streak: streak
+            });
+
+            if (ZEIGE_SERIEN_COINS && coins > 0) {
+                const coinTemplate = pickRandomNoRepeat("streak-coins", SERIE_COIN_TEXTE, 3);
+                html += `<br>${formatEventTemplate(coinTemplate, {
+                    user: userName,
+                    streak: streak,
+                    coins: coins.toLocaleString("de-CH")
+                })}`;
+            }
+
+            if (input) {
+                const inputTemplate = pickRandomNoRepeat("streak-input", SERIE_INPUT_TEXTE, 2);
+                html += `<span class="event-input">${formatEventTemplate(inputTemplate, {
+                    user: userName,
+                    input: input,
+                    streak: streak
+                })}</span>`;
+            }
+
+            const avatar = await getEventAvatar(userInfo);
+            const roles = parseRoleBadges(user);
+            const id = `streak-${data.messageId || Date.now()}-${Math.floor(Math.random() * 10000)}`;
+            const extraClass = `affiliate-event watch-streak${selection.milestone ? " milestone-streak" : ""}`;
+
+            addMessageToUI(
+                id, userName, html, false, avatar,
+                roles.broadcaster, roles.moderator, roles.vip,
+                login, false, false, extraClass
+            );
+
+            triggerStreakCelebration(streak, selection.milestone);
+        }
+
+        // ==========================================
+        //               FEUERWERK
+        // ==========================================
+        const fireworksCanvas = document.getElementById("fireworks-layer");
+        const fireworksCtx = fireworksCanvas.getContext("2d");
+        let fireworksParticles = [];
+        let fireworksRAF = null;
+
+        function resizeFireworksCanvas() {
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+            fireworksCanvas.width = Math.floor(window.innerWidth * dpr);
+            fireworksCanvas.height = Math.floor(window.innerHeight * dpr);
+            fireworksCanvas.style.width = `${window.innerWidth}px`;
+            fireworksCanvas.style.height = `${window.innerHeight}px`;
+            fireworksCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        window.addEventListener("resize", resizeFireworksCanvas);
+        resizeFireworksCanvas();
+
+        function spawnFirework(x, y, intensity = 1) {
+            const count = Math.round(30 + intensity * 14);
+            const hue = Math.floor(Math.random() * 360);
+
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = (1.5 + Math.random() * 3.4) * (0.8 + intensity * 0.18);
+                fireworksParticles.push({
+                    x, y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    life: 1,
+                    decay: 0.012 + Math.random() * 0.014,
+                    size: 1.2 + Math.random() * 2.2,
+                    hue: (hue + Math.random() * 40 - 20 + 360) % 360,
+                    gravity: 0.035 + Math.random() * 0.025
+                });
+            }
+        }
+
+        function renderFireworks() {
+            fireworksCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+            fireworksParticles = fireworksParticles.filter(p => p.life > 0.01);
+            for (const p of fireworksParticles) {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vx *= 0.988;
+                p.vy = p.vy * 0.988 + p.gravity;
+                p.life -= p.decay;
+
+                fireworksCtx.beginPath();
+                fireworksCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                fireworksCtx.fillStyle = `hsla(${p.hue}, 100%, 72%, ${Math.max(0, p.life)})`;
+                fireworksCtx.shadowBlur = 10;
+                fireworksCtx.shadowColor = `hsla(${p.hue}, 100%, 65%, ${Math.max(0, p.life)})`;
+                fireworksCtx.fill();
+            }
+
+            fireworksCtx.shadowBlur = 0;
+
+            if (fireworksParticles.length > 0) {
+                fireworksRAF = requestAnimationFrame(renderFireworks);
+            } else {
+                fireworksCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+                fireworksRAF = null;
+            }
+        }
+
+        function fireworksIntensityForStreak(streak) {
+            if (streak >= 100) return 3.0;
+            if (streak >= 50) return 2.4;
+            if (streak >= 25) return 2.0;
+            if (streak >= 10) return 1.65;
+            if (streak >= 5) return 1.35;
+            return 1.0;
+        }
+
+        function playFireworkSound(intensity = 1) {
+            if (!SERIEN_FEUERWERK_SOUND) return;
+
+            try {
+                const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                if (!AudioCtx) return;
+                const ctx = new AudioCtx();
+                const master = ctx.createGain();
+                master.gain.value = Math.max(0, Math.min(1, SERIEN_FEUERWERK_LAUTSTAERKE));
+                master.connect(ctx.destination);
+
+                const now = ctx.currentTime;
+
+                // kurzer "whoomp"
+                const osc = ctx.createOscillator();
+                const oscGain = ctx.createGain();
+                osc.type = "sine";
+                osc.frequency.setValueAtTime(135, now);
+                osc.frequency.exponentialRampToValueAtTime(48, now + 0.22);
+                oscGain.gain.setValueAtTime(0.0001, now);
+                oscGain.gain.exponentialRampToValueAtTime(0.55, now + 0.012);
+                oscGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.32);
+                osc.connect(oscGain).connect(master);
+                osc.start(now);
+                osc.stop(now + 0.35);
+
+                // Crackle über gefiltertes Rauschen
+                const duration = 0.75 + Math.min(0.7, intensity * 0.16);
+                const buffer = ctx.createBuffer(1, Math.floor(ctx.sampleRate * duration), ctx.sampleRate);
+                const channel = buffer.getChannelData(0);
+                for (let i = 0; i < channel.length; i++) {
+                    const envelope = Math.exp(-i / (ctx.sampleRate * 0.22));
+                    channel[i] = (Math.random() * 2 - 1) * envelope;
+                }
+
+                const noise = ctx.createBufferSource();
+                const filter = ctx.createBiquadFilter();
+                const noiseGain = ctx.createGain();
+                noise.buffer = buffer;
+                filter.type = "highpass";
+                filter.frequency.value = 650;
+                noiseGain.gain.value = 0.34 + Math.min(0.25, intensity * 0.06);
+                noise.connect(filter).connect(noiseGain).connect(master);
+                noise.start(now + 0.04);
+                noise.stop(now + duration + 0.05);
+
+                setTimeout(() => {
+                    try { ctx.close(); } catch (_) {}
+                }, 1800);
+            } catch (_) {}
+        }
+
+        function triggerStreakCelebration(streak, isMilestone = false) {
+            if (!ZEIGE_SERIEN_FEUERWERK) return;
+
+            const intensity = fireworksIntensityForStreak(streak);
+            const bursts = Math.round(2 + intensity * 1.5);
+            const duration = Math.max(900, SERIEN_FEUERWERK_DAUER_MS);
+
+            const launchWave = () => {
+                for (let i = 0; i < bursts; i++) {
+                    setTimeout(() => {
+                        // bewusst eher im rechten/zentralen Hintergrund, damit es hinter dem Chat sichtbar bleibt
+                        const x = window.innerWidth * (0.22 + Math.random() * 0.64);
+                        const y = window.innerHeight * (0.16 + Math.random() * 0.56);
+                        spawnFirework(x, y, intensity);
+                        if (!fireworksRAF) renderFireworks();
+                    }, (duration / Math.max(1, bursts)) * i * 0.74);
+                }
+
+                playFireworkSound(intensity);
+            };
+
+            // Jede Zuschauerserie bekommt Feuerwerk. Ein hinterlegter Meilenstein
+            // bekommt als Extra nach kurzer Pause eine zweite komplette Welle.
+            launchWave();
+            if (isMilestone) setTimeout(launchWave, 650);
+        }
+
+        /* DEBUG_ONLY_START */
+        // ==========================================
+        //               DEBUG-MODUS
+        // ==========================================
+        const DEBUG_AKTIV = DEBUG_MODUS === 1 || new URLSearchParams(location.search).get("debug") === "1";
+
+        let lastSpecialDebugEvent = null;
+        let lastAnyDebugEvent = null;
+
+        function summarizePossibleUserFields(data = {}) {
+            const candidates = {
+                "data.user": data.user,
+                "data.chatter": data.chatter,
+                "data.redeemer": data.redeemer,
+                "data.eventUser": data.eventUser,
+                "data.event_user": data.event_user,
+
+                "data.userName": data.userName,
+                "data.user_name": data.user_name,
+                "data.userLogin": data.userLogin,
+                "data.user_login": data.user_login,
+                "data.userId": data.userId,
+                "data.user_id": data.user_id,
+
+                "data.broadcaster": data.broadcaster,
+                "data.broadcaster_user_name": data.broadcaster_user_name,
+                "data.broadcaster_user_login": data.broadcaster_user_login,
+
+                "data.displayName": data.displayName,
+                "data.display_name": data.display_name,
+                "data.login": data.login,
+                "data.username": data.username
+            };
+
+            const lines = [];
+            for (const [label, value] of Object.entries(candidates)) {
+                if (value === undefined || value === null || value === "") continue;
+
+                if (typeof value === "object") {
+                    const short = {
+                        id: value.id,
+                        login: value.login,
+                        name: value.name,
+                        displayName: value.displayName,
+                        display_name: value.display_name,
+                        userName: value.userName,
+                        user_name: value.user_name,
+                        username: value.username
+                    };
+                    const cleaned = Object.fromEntries(
+                        Object.entries(short).filter(([, v]) =>
+                            v !== undefined && v !== null && v !== ""
+                        )
+                    );
+                    lines.push(`${label}: ${JSON.stringify(cleaned)}`);
+                } else {
+                    lines.push(`${label}: ${String(value)}`);
+                }
+            }
+
+            return lines.length
+                ? lines.join("\n")
+                : "Keine der üblichen User-Felder gefunden.";
+        }
+
+        function ensureEventDebugPanel() {
+            if (!DEBUG_AKTIV) return null;
+
+            let panel = document.getElementById("event-debug-panel");
+            if (panel) return panel;
+
+            panel = document.createElement("div");
+            panel.id = "event-debug-panel";
+            panel.innerHTML = `
+                <div class="event-debug-title">🔎 Live Streamer.bot Event-Debug – camelCase + snake_case</div>
+                <div id="event-debug-summary" class="event-debug-summary">Noch kein Twitch-Event empfangen.</div>
+                <pre id="event-debug-json">Warte auf Event …</pre>
+                <div class="event-debug-note">
+                    RewardRedemption, AutomaticRewardRedemption und WatchStreak bleiben hier stehen,
+                    auch wenn danach noch eine normale ChatMessage kommt.
+                </div>
+            `;
+            document.body.appendChild(panel);
+            return panel;
+        }
+
+        function updateEventDebugPanel(source, type, data) {
+            if (!DEBUG_AKTIV) return;
+
+            const snapshot = {
+                source,
+                type,
+                data: JSON.parse(JSON.stringify(data || {}))
+            };
+
+            lastAnyDebugEvent = snapshot;
+
+            const isSpecial =
+                source === "Twitch" &&
+                (
+                    type === "RewardRedemption" ||
+                    type === "AutomaticRewardRedemption" ||
+                    type === "WatchStreak"
+                );
+
+            if (isSpecial) lastSpecialDebugEvent = snapshot;
+
+            const shown = lastSpecialDebugEvent || lastAnyDebugEvent;
+            if (!shown) return;
+
+            ensureEventDebugPanel();
+
+            const summary = document.getElementById("event-debug-summary");
+            const pre = document.getElementById("event-debug-json");
+
+            if (summary) {
+                summary.textContent =
+                    `EVENT: ${shown.source}.${shown.type}\n\n` +
+                    summarizePossibleUserFields(shown.data);
+            }
+
+            if (pre) {
+                pre.textContent = JSON.stringify(shown, null, 2);
+            }
+        }
+
+        function createDebugPanel() {
+            if (!DEBUG_AKTIV) return;
+
+            const panel = document.createElement("div");
+            panel.id = "debug-panel";
+            panel.innerHTML = `
+                <div class="debug-title">🧪 einfachNat Overlay Debug</div>
+
+                <div><b>Watch Streak – TestViewer</b></div>
+                <div class="debug-row">
+                    <button data-streak="3">Serie 3</button>
+                    <button data-streak="5">Serie 5</button>
+                    <button data-streak="10">Serie 10</button>
+                    <button data-streak="25">Serie 25</button>
+                    <button data-streak="50">Serie 50</button>
+                    <button data-streak="100">Serie 100</button>
+                </div>
+
+                <div style="margin-top:8px;"><b>Kanalpunkte</b></div>
+                <div class="debug-row">
+                    <button id="debug-reward-viewer">Custom Reward – Viewer</button>
+                    <button id="debug-auto-viewer">Facepalm – Viewer</button>
+                    <button id="debug-reward-broadcaster">Broadcaster-Fallback</button>
+                </div>
+
+                <div class="debug-row">
+                    <button id="debug-fireworks">Nur Feuerwerk</button>
+                    <button id="debug-clear">Chat leeren</button>
+                </div>
+
+                <div class="debug-hint">
+                    <b>TestViewer</b> simuliert absichtlich einen normalen Zuschauer.<br>
+                    Der Broadcaster-Test simuliert ein Event, bei dem <code>user</code> fehlt
+                    und nur <code>broadcaster</code> vorhanden ist.<br>
+                    Das Panel erscheint nur bei DEBUG_MODUS = 1 oder ?debug=1.<br>
+                    Unten links erscheint zusätzlich der <b>echte Streamer.bot Roh-Payload</b>.
+                </div>
+            `;
+
+            document.body.appendChild(panel);
+
+            const debugViewer = {
+                login: "testviewer",
+                name: "TestViewer",
+                badges: []
+            };
+
+            panel.querySelectorAll("[data-streak]").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const streak = Number(btn.dataset.streak);
+                    const points = streak >= 100 ? 2500 :
+                                   streak >= 50 ? 1500 :
+                                   streak >= 25 ? 900 :
+                                   streak >= 10 ? 600 :
+                                   streak >= 5 ? 450 : 300;
+
+                    showWatchStreak({
+                        user: debugViewer,
+                        broadcaster: {
+                            login: "einfachnat",
+                            name: "einfachNat"
+                        },
+                        streakCount: streak,
+                        channelPointsAwarded: points,
+                        text: `Ich teste gerade meine ${streak}er-Serie!`,
+                        messageId: `debug-streak-${Date.now()}`
+                    }, true);
+                });
+            });
+
+            document.getElementById("debug-reward-viewer").addEventListener("click", () => {
+                showRewardRedemption({
+                    user: debugViewer,
+                    broadcaster: {
+                        login: "einfachnat",
+                        name: "einfachNat"
+                    },
+                    reward: {
+                        title: "TTS",
+                        cost: 500
+                    },
+                    userInput: "Danke für den Stream!",
+                    redemptionId: `debug-custom-${Date.now()}`
+                }, true);
+            });
+
+            document.getElementById("debug-auto-viewer").addEventListener("click", () => {
+                showAutomaticRewardRedemption({
+                    user: debugViewer,
+                    broadcaster: {
+                        login: "einfachnat",
+                        name: "einfachNat"
+                    },
+                    rewardType: "chosen_sub_emote_unlock",
+                    channelPoints: 50,
+                    text: "",
+                    unlockedEmote: {
+                        text: "Facepalm",
+                        imageUrl: ""
+                    },
+                    id: `debug-auto-${Date.now()}`
+                }, true);
+            });
+
+            document.getElementById("debug-reward-broadcaster").addEventListener("click", () => {
+                // Absichtlich KEIN user-Objekt.
+                showRewardRedemption({
+                    user: null,
+                    broadcaster: {
+                        login: "einfachnat",
+                        name: "einfachNat"
+                    },
+                    reward: {
+                        title: "Facepalm",
+                        cost: 50
+                    },
+                    redemptionId: `debug-broadcaster-${Date.now()}`
+                }, true);
+            });
+
+            document.getElementById("debug-fireworks").addEventListener("click", () => {
+                triggerStreakCelebration(25, true);
+            });
+
+            document.getElementById("debug-clear").addEventListener("click", () => {
+                clearAllMessages();
+            });
+        }
+
+        createDebugPanel();
+        ensureEventDebugPanel();
+        /* DEBUG_ONLY_END */
+
+
+        // ==========================================
+        //         STREAMER.BOT WEBSOCKET
+        // ==========================================
+        
+        let ws;
+        let isConnecting = false;
+        let countdownTimer = null;
+        let sysAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(SYSTEM_NAME)}&background=random&color=fff`;
+
+        function connectWebSocket() {
+            if (isConnecting) return;
+            isConnecting = true;
+
+            if (countdownTimer) { 
+                clearInterval(countdownTimer); 
+                countdownTimer = null; 
+            }
+
+            ws = new WebSocket(`ws://${WS_IP}:${WS_PORT}/`);
+            
+            ws.onopen = () => { 
+                isConnecting = false;
+                
+                const errorElement = document.getElementById('msg-sys-error');
+                if (errorElement) executeExplosion(errorElement);
+                
+                ws.send(JSON.stringify({ 
+                    "request": "Subscribe", 
+                    "events": { 
+                        "Twitch": ["ChatMessage", "ChatMessageDeleted", "ChatCleared", "UserTimedOut", "UserBanned", "RewardRedemption", "AutomaticRewardRedemption", "WatchStreak"], 
+                        "YouTube": ["Message", "MessageDeleted", "ChatMessageDeleted", "UserBanned", "SuperChat"] 
+                    }, 
+                    "id": "MyChatOverlay" 
+                })); 
+                addSystemMessage(); 
+            };
+
+            ws.onerror = (error) => {
+                ws.close();
+            };
+
+            ws.onclose = () => {
+                isConnecting = false;
+                let timeLeft = 5;
+                
+                showErrorBubble(timeLeft);
+                
+                countdownTimer = setInterval(() => {
+                    timeLeft--;
+                    let timerSpan = document.getElementById('reconnect-timer');
+                    if (timerSpan) timerSpan.innerText = timeLeft;
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(countdownTimer);
+                        connectWebSocket();
+                    }
+                }, 1000);
+            };
+
+            ws.onmessage = async (event) => {
+                const response = JSON.parse(event.data); 
+                if (!response.event || !response.event.source) return;
+                
+                const source = response.event.source; 
+                const type = response.event.type;
+                const data = response.data || {};
+
+                        /* DEBUG_ONLY_START */
+                updateEventDebugPanel(source, type, data);
+
+                if (DEBUG_EVENT_DATEN === 1) {
+                    console.log(`[Streamer.bot] ${source}.${type}`, JSON.parse(JSON.stringify(data)));
+                }
+                /* DEBUG_ONLY_END */
+                
+                if (source === "Twitch" && ZEIGE_TWITCH === 0) return; 
+                if (source === "YouTube" && ZEIGE_YOUTUBE === 0) return;
+
+                // Affiliate-Events werden direkt als eigene Overlay-Nachrichten dargestellt.
+                if (source === "Twitch" && type === "RewardRedemption") {
+                    await showRewardRedemption(data);
+                    return;
+                }
+
+                if (source === "Twitch" && type === "AutomaticRewardRedemption") {
+                    await showAutomaticRewardRedemption(data);
+                    return;
+                }
+
+                if (source === "Twitch" && type === "WatchStreak") {
+                    await showWatchStreak(data);
+                    return;
+                }
+
+                if (type === "ChatCleared") { 
+                    clearAllMessages(); 
+                    return; 
+                }
+                if (type === "MessageDeleted" || type === "ChatMessageDeleted") { 
+                    let targetId = data.targetMessageId || data.targetEventId || data.deletedMessageId || data.messageId || data.msgId || data.id || data.eventId || "";
+                    if (!targetId && data.message) { targetId = data.message.id || data.message.messageId || data.message.eventId || ""; }
+                    if (!targetId && data.event) { targetId = data.event.eventId || data.event.id || data.event.targetMessageId || ""; }
+                    if (targetId) triggerExplosionById(targetId); 
+                    return; 
+                }
+                if (type === "UserTimedOut" || type === "UserBanned") { 
+                    let targetUser = (data.user && (data.user.login || data.user.name || data.user.displayName)) || 
+                                     (data.author && (data.author.name || data.author.displayName)) || 
+                                     data.userLogin || data.userName || data.displayName || ""; 
+                    if (targetUser) triggerExplosionByUser(targetUser); 
+                    return; 
+                }
+
+                let userName = "Unbekannt", msgText = "", formattedText = "", userAvatar = ""; 
+                let isBroadcaster = false, isModerator = false, isVip = false, messageId = "", loginNameForFilter = "";
+                let isHauptMod = false;
+
+                try {
+                    // --- TWITCH VERARBEITUNG ---
+                    if (source === "Twitch" && type === "ChatMessage") {
+                        const msgData = data.message || data; 
+                        const userData = data.user || msgData.user || data.chatter || {};
+
+                        messageId = msgData.id || msgData.msgId || msgData.messageId || data.id || data.messageId || "";
+                        
+                        // Liest Name & Login flexibel aus allen neuen/alten Strukturen aus
+                        const loginName = userData.login || userData.name || userData.username || msgData.username || msgData.name || msgData.displayName || "TwitchUser"; 
+                        userName = userData.displayName || userData.name || msgData.displayName || loginName; 
+                        loginNameForFilter = loginName.toLowerCase(); 
+                        msgText = msgData.message || msgData.text || (typeof msgData === "string" ? msgData : "");
+
+                        // User-Input einer Kanalpunkte-Einlösung kann zusätzlich als normale
+                        // ChatMessage eintreffen. Optional ausblenden, damit er nicht doppelt erscheint.
+                        const messageMeta = data.meta || msgData.meta || {};
+                        if (VERSTECKE_CUSTOM_REWARD_CHAT && messageMeta.isCustomReward === true) return;
+
+                        // Badges prüfen (neu: data.user.badges / msgData.badges)
+                        const badges = userData.badges || msgData.badges || data.badges || [];
+                        if (Array.isArray(badges)) { 
+                            isBroadcaster = badges.some(b => b.name === 'broadcaster'); 
+                            isModerator = badges.some(b => b.name === 'moderator'); 
+                            isVip = badges.some(b => b.name === 'vip'); 
+                        } else if (msgData.isVip || userData.isVip) { 
+                            isVip = true; 
+                        }
+                        
+                        isHauptMod = HAUPT_MODS.includes(loginNameForFilter);
+
+                        // --- DER ERWEITERTE MOD-SNIPER ---
+                        if (msgText.toLowerCase().startsWith(CMD_SNIPER.toLowerCase() + " ")) {
+                            if (isBroadcaster || isModerator || isHauptMod) {
+                                // Teilt den Befehl in seine Wörter auf
+                                let args = msgText.substring(CMD_SNIPER.length).trim().split(/\s+/);
+                                if (args.length > 0 && args[0] !== "") {
+                                    let firstArg = args[0];
+                                    
+                                    // 1. Ist das erste Wort ein User mit @? (z.B. !del @1234 oder !del @user)
+                                    if (firstArg.startsWith("@")) {
+                                        let target = firstArg.replace("@", "").toLowerCase();
+                                        let count = (args.length > 1 && !isNaN(args[1])) ? parseInt(args[1], 10) : null;
+                                        triggerExplosionByUser(target, count);
+                                    } 
+                                    // 2. Ist das erste Wort eine Zahl? (z.B. !del 4)
+                                    else if (!isNaN(firstArg)) {
+                                        triggerExplosionCount(parseInt(firstArg, 10));
+                                    } 
+                                    // 3. Wenn es keine Zahl ist und kein @ hat, ist es ein Username
+                                    else {
+                                        let target = firstArg.toLowerCase();
+                                        let count = (args.length > 1 && !isNaN(args[1])) ? parseInt(args[1], 10) : null;
+                                        triggerExplosionByUser(target, count);
+                                    }
+                                }
+                            }
+                            return; // Der Sniper-Befehl wird immer unsichtbar abgefangen
+                        }
+
+                        const deletedTexts = ["[message deleted]", "[message retracted]", "[message deleted by moderator]"];
+                        if (deletedTexts.includes(msgText.toLowerCase())) {
+                            triggerExplosionByUser(loginNameForFilter);
+                            return; 
+                        }
+
+                        let shouldHide = false; 
+                        for (const befehl of VERSTECKTE_BEFEHLE) { 
+                            if (msgText.toLowerCase().startsWith(befehl.toLowerCase())) { shouldHide = true; break; } 
+                        }
+
+                        if (colorCmdStartRegex.test(msgText)) {
+                            const match = msgText.match(colorCmdFullRegex);
+                            if (match) {
+                                const cmd = match[1].toLowerCase(); 
+                                let hex = match[2];
+                                let storageKey = ''; 
+                                
+                                if(cmd === CMD_NAME.toLowerCase()) storageKey = 'namefarbe'; 
+                                else if(cmd === CMD_BUBBLE.toLowerCase()) storageKey = 'bubblefarbe'; 
+                                else if(cmd === CMD_TEXT.toLowerCase()) storageKey = 'textfarbe';
+
+                                if (cmd === CMD_RESET.toLowerCase()) { 
+                                    delete userColorsCache[loginNameForFilter]; 
+                                    localStorage.setItem('twitch_user_colors', JSON.stringify(userColorsCache)); 
+                                } else if (hex && storageKey !== '') { 
+                                    if (!hex.startsWith('#')) hex = '#' + hex; 
+                                    saveUserColor(loginNameForFilter, storageKey, hex); 
+                                }
+                            }
+                            shouldHide = true;
+                        }
+                        
+                        if (shouldHide) return; 
+
+                        const emotes = msgData.emotes || data.emotes || []; 
+                        formattedText = formatEmotes(msgText, emotes); 
+                        userAvatar = await getTwitchAvatarUrl(loginName, userName);
+                    } 
+                    // --- YOUTUBE VERARBEITUNG ---
+                    else if (source === "YouTube" && (type === "Message" || type === "SuperChat")) { 
+                        const ytUser = data.user || data.author || data || {};
+                        
+                        messageId = data.eventId || data.id || data.messageId || ""; 
+                        userName = ytUser.name || data.userName || ytUser.displayName || "YouTube User"; 
+                        loginNameForFilter = userName.toLowerCase(); 
+                        msgText = data.message || data.textContent || ""; 
+                        
+                        isBroadcaster = ytUser.isOwner === true || ytUser.isChatOwner === true || data.isOwner === true; 
+                        isModerator = ytUser.isModerator === true || ytUser.isChatModerator === true || data.isModerator === true; 
+                        isHauptMod = HAUPT_MODS.includes(loginNameForFilter);
+
+                        // --- DER ERWEITERTE MOD-SNIPER ---
+                        if (msgText.toLowerCase().startsWith(CMD_SNIPER.toLowerCase() + " ")) {
+                            if (isBroadcaster || isModerator || isHauptMod) {
+                                let args = msgText.substring(CMD_SNIPER.length).trim().split(/\s+/);
+                                if (args.length > 0 && args[0] !== "") {
+                                    let firstArg = args[0];
+                                    if (firstArg.startsWith("@")) {
+                                        let target = firstArg.replace("@", "").toLowerCase();
+                                        let count = (args.length > 1 && !isNaN(args[1])) ? parseInt(args[1], 10) : null;
+                                        triggerExplosionByUser(target, count);
+                                    } else if (!isNaN(firstArg)) {
+                                        triggerExplosionCount(parseInt(firstArg, 10));
+                                    } else {
+                                        let target = firstArg.toLowerCase();
+                                        let count = (args.length > 1 && !isNaN(args[1])) ? parseInt(args[1], 10) : null;
+                                        triggerExplosionByUser(target, count);
+                                    }
+                                }
+                            }
+                            return; 
+                        }
+
+                        const deletedTexts = ["[message deleted]", "[message retracted]", "[message deleted by moderator]"];
+                        if (deletedTexts.includes(msgText.toLowerCase())) {
+                            triggerExplosionByUser(loginNameForFilter);
+                            return; 
+                        }
+
+                        const emotes = data.emotes || []; 
+                        formattedText = formatEmotes(msgText, emotes); 
+                        
+                        const rawAvatar = ytUser.profileImageUrl || data.profileImageUrl || "";
+                        userAvatar = rawAvatar ? rawAvatar : `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=random&color=fff`; 
+                    } else { 
+                        return; 
+                    }
+
+                    if (!msgText || msgText.trim() === "") return; 
+                    addMessageToUI(messageId, userName, formattedText, source === "YouTube", userAvatar, isBroadcaster, isModerator, isVip, loginNameForFilter, false);
+                } catch (e) {}
+            };
+        }
+
+        connectWebSocket();
+
+        // --- SYSTEM-NACHRICHTEN ---
+        async function addSystemMessage() { 
+            try { 
+                const avatar = await getTwitchAvatarUrl(SYSTEM_TWITCH_LOGIN, SYSTEM_NAME); 
+                if(avatar && avatar.includes('http')) sysAvatarUrl = avatar;
+                addMessageToUI('system-msg-start', SYSTEM_NAME, 'Mit Chat verbunden', false, sysAvatarUrl, false, false, false, SYSTEM_TWITCH_LOGIN, true); 
+            } catch(e) {} 
+        }
+
+        async function showErrorBubble(seconds) {
+            let errorWrapper = document.getElementById('msg-sys-error');
+            
+            if (errorWrapper) {
+                let timerSpan = document.getElementById('reconnect-timer');
+                if (timerSpan) timerSpan.innerText = seconds;
+            } else {
+                try {
+                    const avatar = await getTwitchAvatarUrl(SYSTEM_TWITCH_LOGIN, SYSTEM_NAME);
+                    if(avatar && avatar.includes('http')) sysAvatarUrl = avatar;
+                } catch(e) {}
+                
+                let htmlText = `⚠️ <b>Keine Verbindung</b> ⚠️<br>
+                Der Chat kann den Streamer.bot Websocket Server nicht erreichen. Bitte prüfe, ob Streamer.bot geöffnet ist und die Einstellungen stimmen:<br>
+                <span style="font-family: monospace; color: #ffccaa;">WS-IP: ${WS_IP}<br>Port: ${WS_PORT}</span><br><br>
+                Erneut versuchen in <b id="reconnect-timer" style="color: #ffccaa;">${seconds}</b> Sekunden`;
+
+                addMessageToUI('sys-error', SYSTEM_NAME, htmlText, false, sysAvatarUrl, false, false, false, SYSTEM_TWITCH_LOGIN, 'error', true);
+            }
+        }
+
+        // ==========================================
+        //         DAS HTML-OVERLAY BAUEN
+        // ==========================================
+        function addMessageToUI(msgId, name, htmlText, isYT, avatar, isBroadcaster, isMod, isVip, userLogin, isSystem = false, keepAlive = false, extraClass = "") {
+            const container = document.getElementById('chat-container'); 
+            const wrapper = document.createElement('div'); 
+            wrapper.className = 'message-wrapper'; 
+            
+            if(isSystem === true) wrapper.classList.add('system-msg');
+            else if(isSystem === 'error') wrapper.classList.add('error-msg');
+
+            if (extraClass) {
+                extraClass.split(/\s+/).filter(Boolean).forEach(cls => wrapper.classList.add(cls));
+            } 
+            
+            let isHauptMod = HAUPT_MODS.includes(userLogin);
+            
+            if(ENABLE_GLITTER && !isBroadcaster) { 
+                if (isVip) wrapper.classList.add('vip-glitter'); 
+                else if (isMod || isHauptMod) wrapper.classList.add('mod-glitter'); 
+            }
+            
+            if(msgId) wrapper.id = `msg-${msgId}`; 
+            if(userLogin) wrapper.setAttribute('data-username', userLogin.toLowerCase());
+            
+            const platformImg = isYT ? 'https://upload.wikimedia.org/wikipedia/commons/0/09/YouTube_full-color_icon_%282017%29.svg' : 'https://upload.wikimedia.org/wikipedia/commons/d/d3/Twitch_Glitch_Logo_Purple.svg';
+            
+            let roleIcon = ""; 
+            if (isBroadcaster) roleIcon = ICON_BROADCASTER; 
+            else if (isHauptMod) roleIcon = ICON_HAUPTMOD; 
+            else if (isMod) roleIcon = ICON_MOD; 
+            else if (isVip) roleIcon = ICON_VIP;
+
+            const prefs = userColorsCache[userLogin] || {}; 
+            const customNameColor = prefs['namefarbe'] || DEF_NAME; 
+            const customBubbleBg = prefs['bubblefarbe'] || DEF_BUB_RGBA; 
+            const customTextColor = prefs['textfarbe'] || DEF_TEXT;
+            
+            let textShadowStyle = ''; 
+            let bgCheckHex = prefs['bubblefarbe'] || DEF_BUB_HEX;  
+            
+            let contrast = calculateContrast(bgCheckHex, customTextColor); 
+            if (contrast < 3.0) { 
+                let bgRgb = hexToRgb(bgCheckHex); 
+                let bgLum = bgRgb ? getLuminance(bgRgb.r, bgRgb.g, bgRgb.b) : 0; 
+                let strokeColor = bgLum > 0.5 ? '#000000' : '#ffffff'; 
+                textShadowStyle = `text-shadow: -2px -2px 0 ${strokeColor}, 2px -2px 0 ${strokeColor}, -2px 2px 0 ${strokeColor}, 2px 2px 0 ${strokeColor}, 0 2px 4px rgba(0,0,0,0.8);`; 
+            }
+
+            let bubbleStyle = `background: ${customBubbleBg}; color: ${customTextColor}; ${textShadowStyle}`; 
+            let nameStyle = `color: ${customNameColor};`;
+
+            wrapper.innerHTML = `
+                <div class="message-content">
+                    <span class="username" style="${nameStyle}">${name}</span>
+                    <div class="bubble" style="${bubbleStyle}">${htmlText}</div>
+                </div>
+                <div class="avatar-container">
+                    <img class="avatar" src="${avatar}" onerror="this.src='https://ui-avatars.com/api/?name=${name}&background=random&color=fff'">
+                    <img class="platform-icon" src="${platformImg}">
+                    ${roleIcon}
+                </div>
+            `; 
+            
+            container.appendChild(wrapper);
+
+            requestAnimationFrame(() => { requestAnimationFrame(() => { wrapper.classList.add('animate-in'); }); });
+
+            if (!keepAlive) {
+                if (DAUER > 0 && !isSystem) { 
+                    setTimeout(() => { 
+                        if(wrapper && !wrapper.classList.contains('explode')) { 
+                            wrapper.classList.add('fade-out'); 
+                            wrapper.classList.remove('animate-in'); 
+                            setTimeout(() => wrapper.remove(), 600); 
+                        } 
+                    }, DAUER * 1000); 
+                } 
+                else if (isSystem === true) { 
+                    setTimeout(() => { 
+                        if(wrapper && !wrapper.classList.contains('explode')) { 
+                            wrapper.classList.add('fade-out'); 
+                            wrapper.classList.remove('animate-in'); 
+                            setTimeout(() => wrapper.remove(), 600); 
+                        } 
+                    }, 8000); 
+                }
+            }
+
+            if (container.children.length > 25) { 
+                const first = RICHTUNG === 1 ? container.children[0] : container.children[container.children.length - 1]; 
+                if (!first.classList.contains('explode')) { 
+                    first.classList.add('fade-out'); 
+                    first.classList.remove('animate-in'); 
+                    setTimeout(() => first.remove(), 600); 
+                } 
+            }
+        }
+
+        // ==========================================
+        //         LÖSCH-FUNKTIONEN (Explosionen)
+        // ==========================================
+        function triggerExplosionById(msgId) { 
+            const msgElement = document.getElementById(`msg-${msgId}`); 
+            if (msgElement) executeExplosion(msgElement); 
+        }
+        
+        // NEU: Nimmt optional einen Zähler an, um nur die letzten X Nachrichten eines Users zu löschen
+        function triggerExplosionByUser(username, maxCount = null) { 
+            const container = document.getElementById('chat-container'); 
+            const messages = container.children; 
+            const targetLower = username.toLowerCase(); 
+            let deletedCount = 0;
+            
+            // Rückwärts durchlaufen, damit immer die NEUESTEN Nachrichten zuerst gelöscht werden
+            for (let i = messages.length - 1; i >= 0; i--) { 
+                if (messages[i].getAttribute('data-username') === targetLower) { 
+                    executeExplosion(messages[i]); 
+                    deletedCount++;
+                    if (maxCount !== null && deletedCount >= maxCount) break;
+                } 
+            } 
+        }
+
+        // NEU: Löscht einfach blind die letzten X sichtbaren Nachrichten im Chat
+        function triggerExplosionCount(maxCount) {
+            const container = document.getElementById('chat-container'); 
+            const messages = container.children; 
+            let deletedCount = 0;
+            
+            for (let i = messages.length - 1; i >= 0; i--) { 
+                // Schützt die Systemnachrichten (System) davor, einfach weggesprengt zu werden
+                if (!messages[i].classList.contains('system-msg') && !messages[i].classList.contains('error-msg')) {
+                    executeExplosion(messages[i]); 
+                    deletedCount++;
+                    if (deletedCount >= maxCount) break;
+                }
+            } 
+        }
+        
+        function executeExplosion(element) { 
+            element.classList.add('explode'); 
+            element.classList.remove('animate-in'); 
+            setTimeout(() => { if(element) element.remove(); }, 900); 
+        }
+        
+        function clearAllMessages() { 
+            const container = document.getElementById('chat-container'); 
+            const messages = container.children; 
+            for (let i = 0; i < messages.length; i++) { 
+                messages[i].classList.add('explode'); 
+                messages[i].classList.remove('animate-in'); 
+            } 
+            setTimeout(() => { container.innerHTML = ''; }, 900); 
+        }
+    </_script>
+</body>
+</html>
+</script>
+</body>
+</html>
