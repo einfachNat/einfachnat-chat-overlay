@@ -2,7 +2,7 @@
 
 Ein frei konfigurierbares Chat Overlay für OBS, Streamer.bot, Twitch und YouTube.
 
-**Aktuelle Version: 1.1.0**
+**Aktuelle Version: 1.1.1**
 
 Der einfachste Weg zum eigenen Overlay ist der Generator auf:
 
