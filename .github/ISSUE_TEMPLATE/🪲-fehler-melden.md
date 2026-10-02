@@ -1,5 +1,5 @@
 ---
-name: Fehler melden
+name: "\U0001FAB2 Fehler melden"
 about: Etwas funktioniert im Chat Overlay oder Generator nicht wie erwartet.
 title: ''
 labels: ''
