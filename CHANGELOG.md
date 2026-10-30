@@ -2,6 +2,18 @@
 
 Hier werden die wichtigsten Änderungen am einfachNat Chat Overlay dokumentiert.
 
+## [1.1.2] - 2026-10-30
+
+### Neu
+- Chatblasen können links oder rechts angezeigt werden
+- Laufrichtung unabhängig von der Chatblasenposition
+- Twitch-Affiliate-Einstellungen über einen Hauptschalter einblendbar
+
+### Verbessert
+- Bestehende Affiliate-Einstellungen werden beim Import übernommen
+- Ältere Chat-Overlays werden besser erkannt
+
+
 ## [1.1.1] - 2026-10-02
 
 Erster öffentlicher GitHub-Release des einfachNat Chat Overlays.

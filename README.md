@@ -2,7 +2,7 @@
 
 Ein frei konfigurierbares Chat Overlay für OBS, Streamer.bot, Twitch und YouTube.
 
-**Aktuelle Version: 1.1.1**
+**Aktuelle Version: 1.1.2**
 
 Der einfachste Weg zum eigenen Overlay ist der Generator auf:
 
@@ -36,6 +36,9 @@ Wenn dir etwas fehlt oder du eine Idee hast, melde dich gerne. Vielleicht wird d
 - Zuschauerserien / Watch Streaks
 - Feuerwerk und Sound für Zuschauerserien
 - optionale Diagnosefunktionen für Streamer.bot-Events
+- Chatblasen wahlweise links oder rechts
+- Chat wächst nach oben oder nach unten
+- Affiliate-Einstellungen optional einblendbar
 
 ## Verwendung
 

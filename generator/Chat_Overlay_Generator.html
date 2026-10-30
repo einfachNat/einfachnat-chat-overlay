@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="generator" content="einfachNat Chat Overlay Generator 1.1.1">
+    <meta name="generator" content="einfachNat Chat Overlay Generator 1.1.2">
     <!-- Interne Arbeitsvariante B -->
     <meta name="author" content="einfachNat">
-    <title>einfachNat Chat Overlay Generator 1.1.1</title>
+    <title>einfachNat Chat Overlay Generator 1.1.2</title>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -49,6 +49,19 @@
             border-radius: 15px; font-size: 14px; font-weight: bold;
         }
 
+        [hidden] { display: none !important; }
+        .header-preview.preview-top { flex-direction: column-reverse; justify-content: flex-end;
+            -webkit-mask-image: linear-gradient(to top, transparent 0%, black 15%, black 100%);
+            mask-image: linear-gradient(to top, transparent 0%, black 15%, black 100%); }
+        .header-preview.preview-left .hp-msg { flex-direction:row-reverse; justify-content:flex-end;
+            transform-origin:left bottom; animation-name:slideInPreviewLeft; }
+        .header-preview.preview-left .hp-msg.fade-out { animation-name:fadeOutPreviewLeft; }
+        .header-preview.preview-left .hp-content { align-items:flex-start; margin-right:0; margin-left:10px; }
+        .header-preview.preview-left .hp-bubble { border-radius:0 15px 15px 15px; }
+        @keyframes slideInPreviewLeft { from { opacity:0; transform:translateX(-30px) scale(.9);max-height:0;margin-bottom:0; }
+            to { opacity:1; transform:translateX(0) scale(1); max-height:200px; margin-bottom:12px; } }
+        @keyframes fadeOutPreviewLeft { from { opacity:1; transform:translateX(0) scale(1);max-height:200px;margin-bottom:12px; }
+            to { opacity:0; transform:translateX(20px) scale(.9);max-height:0;margin-bottom:0;padding:0;border:0; } }
         .header-preview-wrapper { display: flex; flex-direction: column; width: 560px; flex-shrink: 0; background: rgba(0,0,0,0.3); border-radius: 10px; border-left: none; overflow: hidden; }
         .header-preview {
             display: flex; flex-direction: column; justify-content: flex-end; gap: 0; height: 130px; 
@@ -299,7 +312,7 @@
 <div class="container">
     <div class="header-container">
         <div class="header-text">
-            <h1>Stream Chat Overlay <span class="version-badge">v1.1.1</span></h1>
+            <h1>Stream Chat Overlay <span class="version-badge">v1.1.2</span></h1>
             <p class="subtitle">Stelle dein Overlay ein, teste die wichtigsten Funktionen und lade danach die fertige HTML-Datei für OBS herunter.</p>
             <div class="preset-note">💜 Standard-Preset: <strong>einfachNat</strong> – alle Werte können geändert werden.</div>
         </div>
@@ -309,7 +322,7 @@
                 <input type="text" id="custom-preview-msg" placeholder="Teste den Chat..." onkeypress="if(event.key === 'Enter') sendCustomPreviewMsg()">
                 <button type="button" onclick="sendCustomPreviewMsg()">Chat</button>
             </div>
-            <div class="preview-action-row">
+            <div class="preview-action-row" id="affiliate-preview-actions" hidden>
                 <button type="button" class="btn-small" onclick="sendAffiliatePreview('reward')">Kanalpunkte</button>
                 <button type="button" class="btn-small" onclick="sendAffiliatePreview('streak5')">Serie 5</button>
                 <button type="button" class="btn-small" onclick="sendAffiliatePreview('streak25')">Serie 25</button>
@@ -343,57 +356,27 @@
                 <div class="note">0 = Nachrichten bleiben dauerhaft sichtbar.</div>
             </div>
             <div class="form-group">
-                <label>Neue Nachrichten erscheinen</label>
+                <label for="cfg-richtung">Laufrichtung</label>
                 <select id="cfg-richtung">
-                    <option value="1">UNTEN – Chat wächst nach oben</option>
-                    <option value="2">OBEN – Chat wächst nach unten</option>
+                    <option value="1">Von unten nach oben (neu unten)</option>
+                    <option value="2">Von oben nach unten (neu oben)</option>
                 </select>
+            </div>
+            <div class="form-group">
+                <label for="cfg-position">Position der Chatblase</label>
+                <select id="cfg-position">
+                    <option value="right">Rechts (Profilbild rechts)</option>
+                    <option value="left">Links (Profilbild links)</option>
+                </select>
+                <div class="note">Links/rechts und oben/unten funktionieren unabhängig voneinander.</div>
             </div>
         </div>
         <div class="checkbox-group"><input type="checkbox" id="cfg-twitch" checked><label for="cfg-twitch">Twitch Chat anzeigen</label></div>
         <div class="checkbox-group"><input type="checkbox" id="cfg-youtube" checked><label for="cfg-youtube">YouTube Chat anzeigen</label></div>
     </div>
 
-    <div class="section affiliate-section">
-        <h2>3. Twitch Affiliate <span class="new-badge">NEU in 1.1.1</span></h2>
-        <p class="section-desc">Kanalpunkte und Zuschauerserien werden über Twitch-Events von Streamer.bot eingeblendet. Nicht benötigt? Einfach ausschalten.</p>
-
-        <div class="feature-card">
-            <div class="checkbox-group"><input type="checkbox" id="cfg-channel-points" checked><label for="cfg-channel-points"><strong>Kanalpunkte-Einlösungen anzeigen</strong></label></div>
-            <div class="grid-2">
-                <div class="form-group">
-                    <label>Name deiner Kanalpunkte</label><input type="text" id="cfg-currency" value="Kanalpunkte">
-                    <div class="note">Dieser Begriff erhält in Eventmeldungen automatisch den Regenbogeneffekt.</div>
-                </div>
-                <div class="form-group">
-                    <label>Dateiname des Kanalpunkte-Bildes</label><input type="text" id="cfg-coin-gif-file" value="Kanalpunkte.gif">
-                    <div class="note">Unterstützt werden GIF, PNG, JPG/JPEG und WebP. Die Bilddatei muss neben der fertigen HTML-Datei liegen.</div>
-                </div>
-            </div>
-            <div class="checkbox-group"><input type="checkbox" id="cfg-coin-gif" checked><label for="cfg-coin-gif">Kanalpunkte-Bild anzeigen</label></div>
-        </div>
-
-        <div class="feature-card">
-            <div class="checkbox-group"><input type="checkbox" id="cfg-watch-streaks" checked><label for="cfg-watch-streaks"><strong>Zuschauerserien im Chat anzeigen</strong></label></div>
-            <div class="checkbox-group"><input type="checkbox" id="cfg-streak-coins" checked><label for="cfg-streak-coins">Von Twitch vergebene Kanalpunkte erwähnen</label></div>
-            <div class="checkbox-group"><input type="checkbox" id="cfg-fireworks" checked><label for="cfg-fireworks">Feuerwerk anzeigen</label></div>
-            <div class="checkbox-group"><input type="checkbox" id="cfg-firework-sound" checked><label for="cfg-firework-sound">Feuerwerk-Sound abspielen</label></div>
-            <div class="form-group">
-                <label for="cfg-firework-volume">Feuerwerk-Lautstärke: <span id="firework-volume-value">22 %</span></label>
-                <input type="range" id="cfg-firework-volume" min="0" max="100" value="22">
-                <div class="note">0 % = stumm, 100 % = volle Lautstärke.</div>
-            </div>
-            <div class="firework-test-row">
-                <button type="button" class="btn-small" onclick="testGeneratorFireworks()">🎆 Feuerwerk testen</button>
-                <div class="note">Testet das doppelte Meilenstein-Feuerwerk mit der aktuell eingestellten Lautstärke. Ist der Sound ausgeschaltet, bleibt der Test stumm.</div>
-                <div class="note" id="firework-test-status"></div>
-            </div>
-        </div>
-        <div class="note">Eigene Texte lassen sich unten bearbeiten. Leere Listen bleiben auch beim Import leer.</div>
-    </div>
-
     <div class="section">
-        <h2>4. Farben & Darstellung</h2>
+        <h2>3. Farben & Darstellung</h2>
         <p class="section-desc">Passe das Aussehen der Chatblasen an. Vorschau und Download verwenden dieselbe Deckkraft.</p>
         <div style="display:flex; gap:20px; align-items:flex-start; flex-wrap:wrap;">
             <div style="flex:1; min-width:250px;">
@@ -409,7 +392,7 @@
             <div id="preview-container" style="flex:1; background:#000; padding:20px; border-radius:15px; border:1px solid #5a3885; display:flex; flex-direction:column; align-items:flex-end; position:relative;">
                 <button type="button" class="btn-small" id="toggle-preview-btn" onclick="togglePreviewBg()" style="position:absolute; top:10px; left:10px;">Hintergrund Hell/Dunkel</button>
                 <label id="preview-label" style="color:#aaa; font-size:12px; margin-bottom:10px; align-self:flex-start; margin-top:30px;">Statische Vorschau</label>
-                <div style="display:flex; flex-direction:column; align-items:flex-end; max-width:100%;">
+                <div id="static-preview-chat" style="display:flex; flex-direction:column; align-items:flex-end; max-width:100%;">
                     <span id="prev-name" class="hp-name">ZuschauerName</span>
                     <div id="prev-bubble" class="hp-bubble"><span id="prev-text">Das ist eine Testnachricht!</span></div>
                 </div>
@@ -418,7 +401,7 @@
     </div>
 
     <div class="section">
-        <h2>5. Rollen, Abzeichen & Aufleuchten</h2>
+        <h2>4. Rollen, Abzeichen & Aufleuchten</h2>
         <p class="section-desc">Lege fest, wer besondere Icons bekommt und in welcher Farbe VIPs und Mods aufleuchten.</p>
         <div class="form-group">
             <label>Hauptmoderatoren (Twitch-Namen, mit Komma trennen)</label><input type="text" id="cfg-hauptmods" value="">
@@ -452,7 +435,7 @@
     </div>
 
     <div class="section">
-        <h2>6. Eigene Chatbefehle & Filter</h2>
+        <h2>5. Eigene Chatbefehle & Filter</h2>
         <p class="section-desc">Zuschauer können ihre Farben ändern; Mods können Nachrichten über den Sniper-Befehl entfernen.</p>
         <div class="grid-2">
             <div class="form-group"><label>Befehl: Namensfarbe</label><input type="text" id="cfg-cmd-name" value="!namefarbe"></div>
@@ -471,15 +454,47 @@
         </div>
     </div>
 
-    <details class="section advanced-section">
-        <summary>Erweiterte Einstellungen</summary>
-        <div class="advanced-content">
-            <div class="checkbox-group"><input type="checkbox" id="cfg-diagnostics"><label for="cfg-diagnostics"><strong>Diagnosefunktionen für Fehlersuche einbauen</strong></label></div>
-            <div class="note">Standardmässig wird der komplette Debug-/Rohdaten-Inspector nicht in die Overlay-Datei eingebaut. Die Diagnoseversion startet mit sichtbarem Debugpanel und wird als <b>chat_overlay_diagnose.html</b> gespeichert.</div>
+    <div class="section affiliate-section">
+        <h2>6. Twitch Affiliate <span class="new-badge">Optional</span></h2>
+        <p class="section-desc">Diese Extras sind freiwillig. Ohne Häkchen bleiben die Einstellungen verborgen und die Events im erzeugten Overlay ausgeschaltet.</p>
+        <div class="checkbox-group"><input type="checkbox" id="cfg-affiliate"><label for="cfg-affiliate"><strong>Twitch-Affiliate-Funktionen verwenden</strong></label></div>
+        <div id="affiliate-options" hidden>
+        <div class="feature-card">
+            <div class="checkbox-group"><input type="checkbox" id="cfg-channel-points" checked><label for="cfg-channel-points"><strong>Kanalpunkte-Einlösungen anzeigen</strong></label></div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Name deiner Kanalpunkte</label><input type="text" id="cfg-currency" value="Kanalpunkte">
+                    <div class="note">Dieser Begriff erhält in Eventmeldungen automatisch den Regenbogeneffekt.</div>
+                </div>
+                <div class="form-group">
+                    <label>Dateiname des Kanalpunkte-Bildes</label><input type="text" id="cfg-coin-gif-file" value="Kanalpunkte.gif">
+                    <div class="note">Unterstützt werden GIF, PNG, JPG/JPEG und WebP. Die Bilddatei muss neben der fertigen HTML-Datei liegen.</div>
+                </div>
+            </div>
+            <div class="checkbox-group"><input type="checkbox" id="cfg-coin-gif" checked><label for="cfg-coin-gif">Kanalpunkte-Bild anzeigen</label></div>
         </div>
-    </details>
 
-    <div class="section text-editor-section">
+        <div class="feature-card">
+            <div class="checkbox-group"><input type="checkbox" id="cfg-watch-streaks" checked><label for="cfg-watch-streaks"><strong>Zuschauerserien im Chat anzeigen</strong></label></div>
+            <div class="checkbox-group"><input type="checkbox" id="cfg-streak-coins" checked><label for="cfg-streak-coins">Von Twitch vergebene Kanalpunkte erwähnen</label></div>
+            <div class="checkbox-group"><input type="checkbox" id="cfg-fireworks" checked><label for="cfg-fireworks">Feuerwerk anzeigen</label></div>
+            <div class="checkbox-group"><input type="checkbox" id="cfg-firework-sound" checked><label for="cfg-firework-sound">Feuerwerk-Sound abspielen</label></div>
+            <div class="form-group">
+                <label for="cfg-firework-volume">Feuerwerk-Lautstärke: <span id="firework-volume-value">22 %</span></label>
+                <input type="range" id="cfg-firework-volume" min="0" max="100" value="22">
+                <div class="note">0 % = stumm, 100 % = volle Lautstärke.</div>
+            </div>
+            <div class="firework-test-row">
+                <button type="button" class="btn-small" onclick="testGeneratorFireworks()">🎆 Feuerwerk testen</button>
+                <div class="note">Testet das doppelte Meilenstein-Feuerwerk mit der aktuell eingestellten Lautstärke. Ist der Sound ausgeschaltet, bleibt der Test stumm.</div>
+                <div class="note" id="firework-test-status"></div>
+            </div>
+        </div>
+        <div class="note">Eigene Texte lassen sich unten bearbeiten. Leere Listen bleiben auch beim Import leer.</div>
+        </div>
+    </div>
+
+    <div class="section text-editor-section" id="affiliate-text-section" hidden>
         <h2>Eigene Texte für Kanalpunkte & Zuschauerserien</h2>
         <p class="text-editor-intro">
             Hier legst du fest, welche Meldungen bei Kanalpunkte-Einlösungen und bei Zuschauerserien im Chat erscheinen können.
@@ -502,6 +517,14 @@
         <div id="text-editors"></div>
     </div>
 
+    <details class="section advanced-section">
+        <summary>Erweiterte Einstellungen</summary>
+        <div class="advanced-content">
+            <div class="checkbox-group"><input type="checkbox" id="cfg-diagnostics"><label for="cfg-diagnostics"><strong>Diagnosefunktionen für Fehlersuche einbauen</strong></label></div>
+            <div class="note">Standardmässig wird der komplette Debug-/Rohdaten-Inspector nicht in die Overlay-Datei eingebaut. Die Diagnoseversion startet mit sichtbarem Debugpanel und wird als <b>chat_overlay_diagnose.html</b> gespeichert.</div>
+        </div>
+    </details>
+
     <div class="feedback-box">
         <strong>💡 Dir fehlt eine Funktion oder du hast eine Idee?</strong>
         <p>Schreib mir gerne, wenn etwas nicht funktioniert oder dir noch eine Funktion fehlt. Gute Ideen können in eine zukünftige Version einfliessen und stehen dann allen zur Verfügung.</p>
@@ -523,8 +546,8 @@
         </label>
     </div>
 
-    <button class="download-button" onclick="generateOverlay()">Chat-Overlay 1.1.1 erstellen & herunterladen</button>
-    <div class="license-text">Generator & Overlay v1.1.1 · einfachNat · einfachnat.ch/chat-overlay</div>
+    <button class="download-button" onclick="generateOverlay()">Chat-Overlay 1.1.2 erstellen & herunterladen</button>
+    <div class="license-text">Generator & Overlay v1.1.2 · einfachNat · einfachnat.ch/chat-overlay</div>
 </div>
 
 
@@ -572,11 +595,17 @@
     };
     function configFields() { return [...document.querySelectorAll('[id^="cfg-"]')].filter(e => /^(INPUT|SELECT|TEXTAREA)$/.test(e.tagName) && e.id !== 'cfg-license'); }
     function readFields() { return Object.fromEntries(configFields().map(e=>[e.id.slice(4),e.type==='checkbox'?e.checked:e.value])); }
-    function collectConfig() { return {schemaVersion:1,overlayVersion:'1.1.1',settings:readFields(),texts:cloneConfig(textValues)}; }
+    function collectConfig() { return {schemaVersion:1,overlayVersion:'1.1.2',settings:readFields(),texts:cloneConfig(textValues)}; }
     function validTexts(v) { return Array.isArray(v) && v.length<=1000 && v.every(x=>typeof x==='string' && x.length<=20000); }
     function mergeConfig(imported) {
-        const result={schemaVersion:1,overlayVersion:'1.1.1',settings:cloneConfig(fieldDefaults),texts:cloneConfig(TEXT_DEFAULTS)};
+        const result={schemaVersion:1,overlayVersion:'1.1.2',settings:cloneConfig(fieldDefaults),texts:cloneConfig(TEXT_DEFAULTS)};
         const settings=imported.settings || {};
+        // 1.1.1 kannte keinen Affiliate-Hauptschalter: frühere aktivierte Extras erkennen.
+        // Bei 1.1.2 respektieren wir den ausdrücklich gespeicherten Schalter,
+        // selbst wenn einzelne (aktuell verborgene) Optionen weiterhin angehakt sind.
+        if (typeof settings.affiliate !== 'boolean') {
+            result.settings.affiliate = settings['channel-points'] === true || settings['watch-streaks'] === true;
+        }
         for(const e of configFields()) {
             const k=e.id.slice(4), v=settings[k];
             if(e.type==='checkbox') { if(typeof v==='boolean') result.settings[k]=v; continue; }
@@ -600,7 +629,7 @@
     }
     function applyConfig(config) {
         for(const e of configFields()) { const v=config.settings[e.id.slice(4)]; if(e.type==='checkbox') e.checked=v; else e.value=v; }
-        textValues=cloneConfig(config.texts); renderTextEditors(); updateLivePreview();
+        textValues=cloneConfig(config.texts); renderTextEditors(); updateLivePreview(); updateAffiliateVisibility();
     }
     function renderTextEditors() {
         const root = document.getElementById('text-editors');
@@ -793,7 +822,7 @@
         }
         const result=value();space();return {value:result,end:i};
     }
-    const LEGACY_FIELDS={WS_IP:'ws-ip',WS_PORT:'ws-port',SYSTEM_NAME:'sys-name',SYSTEM_TWITCH_LOGIN:'sys-account',DAUER:'dauer',RICHTUNG:'richtung',ZEIGE_TWITCH:'twitch',ZEIGE_YOUTUBE:'youtube',HAUPT_MODS:'hauptmods',CMD_NAME:'cmd-name',CMD_BUBBLE:'cmd-bubble',CMD_TEXT:'cmd-text',CMD_RESET:'cmd-reset',CMD_SNIPER:'cmd-sniper',VERSTECKTE_BEFEHLE:'hidden-cmds',ENABLE_GLITTER:'glitter',DEF_NAME:'color-name',DEF_TEXT:'color-text',DEF_BUB_HEX:'color-bubble',ICON_BROADCASTER_FILE:'icon-broadcaster',ICON_HAUPTMOD_FILE:'icon-hauptmod',ICON_MOD_FILE:'icon-mod',ICON_VIP_FILE:'icon-vip',ZEIGE_KANALPUNKTE:'channel-points',ZEIGE_ZUSCHAUERSERIEN:'watch-streaks',KANALPUNKTE_WAEHRUNG:'currency',ZEIGE_KANALPUNKTE_GIF:'coin-gif',KANALPUNKTE_GIF_DATEI:'coin-gif-file',ZEIGE_KANALPUNKTE_BILD:'coin-gif',KANALPUNKTE_BILD_DATEI:'coin-gif-file',ZEIGE_SERIEN_COINS:'streak-coins',ZEIGE_SERIEN_FEUERWERK:'fireworks',SERIEN_FEUERWERK_SOUND:'firework-sound',SERIEN_FEUERWERK_LAUTSTAERKE:'firework-volume',DEBUG_MODUS:'diagnostics'};
+    const LEGACY_FIELDS={POSITION_CHATBLASE:'position',WS_IP:'ws-ip',WS_PORT:'ws-port',SYSTEM_NAME:'sys-name',SYSTEM_TWITCH_LOGIN:'sys-account',DAUER:'dauer',RICHTUNG:'richtung',ZEIGE_TWITCH:'twitch',ZEIGE_YOUTUBE:'youtube',HAUPT_MODS:'hauptmods',CMD_NAME:'cmd-name',CMD_BUBBLE:'cmd-bubble',CMD_TEXT:'cmd-text',CMD_RESET:'cmd-reset',CMD_SNIPER:'cmd-sniper',VERSTECKTE_BEFEHLE:'hidden-cmds',ENABLE_GLITTER:'glitter',DEF_NAME:'color-name',DEF_TEXT:'color-text',DEF_BUB_HEX:'color-bubble',ICON_BROADCASTER_FILE:'icon-broadcaster',ICON_HAUPTMOD_FILE:'icon-hauptmod',ICON_MOD_FILE:'icon-mod',ICON_VIP_FILE:'icon-vip',ZEIGE_KANALPUNKTE:'channel-points',ZEIGE_ZUSCHAUERSERIEN:'watch-streaks',KANALPUNKTE_WAEHRUNG:'currency',ZEIGE_KANALPUNKTE_GIF:'coin-gif',KANALPUNKTE_GIF_DATEI:'coin-gif-file',ZEIGE_KANALPUNKTE_BILD:'coin-gif',KANALPUNKTE_BILD_DATEI:'coin-gif-file',ZEIGE_SERIEN_COINS:'streak-coins',ZEIGE_SERIEN_FEUERWERK:'fireworks',SERIEN_FEUERWERK_SOUND:'firework-sound',SERIEN_FEUERWERK_LAUTSTAERKE:'firework-volume',DEBUG_MODUS:'diagnostics'};
     function importHTML(html) {
         if(html.length>8*1024*1024)throw Error('Die Datei ist zu gross (maximal 8 MB).');
         const scripts=/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi;let match;
@@ -801,10 +830,10 @@
             if(/\bid\s*=\s*["']einfachnat-overlay-config["']/i.test(match[1])) {
                 const c=JSON.parse(match[2]);
                 if(!c || c.schemaVersion!==1 || !c.settings || typeof c.settings!=='object')throw Error('Dieses Konfigurationsschema wird nicht unterstützt.');
-                return {config:mergeConfig(c),message:'Einstellungen übernommen. Fehlende neue Werte verwenden die Standards von 1.1.1.'};
+                return {config:mergeConfig(c),message:'Einstellungen übernommen. Fehlende neue Werte verwenden die Standards von 1.1.2.'};
             }
         }
-        if(!/einfachnat/i.test(html) || !/const\s+WS_IP\s*=/.test(html) || !/const\s+DAUER\s*=/.test(html))throw Error('Keine kompatible einfachNat-Konfiguration gefunden.');
+        if(!/id=[\"']chat-container[\"']/.test(html) || !/const\s+WS_IP\s*=/.test(html) || !/const\s+DAUER\s*=/.test(html) || !/const\s+RICHTUNG\s*=/.test(html))throw Error('Keine kompatible Chat-Overlay-Konfiguration gefunden.');
         const c={settings:{},texts:{}}, values={};let found=0;
         for(const key of [...Object.keys(LEGACY_FIELDS),...Object.keys(TEXT_DEFAULTS),'DEF_BUB_RGBA']) {
             const m=new RegExp('\\bconst\\s+'+key+'\\s*=\\s*').exec(html);if(!m)continue;
@@ -826,6 +855,7 @@
     }
     document.addEventListener('DOMContentLoaded',()=>{
         fieldDefaults=readFields();renderTextEditors();
+        document.getElementById('cfg-affiliate').addEventListener('change',updateAffiliateVisibility);
         document.getElementById('overlay-import').addEventListener('change',async event=>{
             const file=event.target.files[0],status=document.getElementById('import-status');if(!file)return;
             try{if(file.size>8*1024*1024)throw Error('Die Datei ist zu gross (maximal 8 MB).');const result=importHTML(await file.text());applyConfig(result.config);status.textContent='✓ '+result.message;}
@@ -1093,7 +1123,28 @@
         }
     }
 
+    function updateAffiliateVisibility() {
+        const enabled = document.getElementById('cfg-affiliate').checked;
+        document.getElementById('affiliate-options').hidden = !enabled;
+        document.getElementById('affiliate-text-section').hidden = !enabled;
+        document.getElementById('affiliate-preview-actions').hidden = !enabled;
+    }
+
+    function updateChatPositionPreview() {
+        const left = document.getElementById('cfg-position').value === 'left';
+        const top = document.getElementById('cfg-richtung').value === '2';
+        const header = document.getElementById('animated-preview-box');
+        header.classList.toggle('preview-left',left);
+        header.classList.toggle('preview-top',top);
+        const staticBox = document.getElementById('preview-container');
+        staticBox.style.alignItems = left ? 'flex-start' : 'flex-end';
+        document.getElementById('static-preview-chat').style.alignItems = left ? 'flex-start' : 'flex-end';
+        document.getElementById('prev-bubble').style.borderRadius = left ? '0 15px 15px 15px' : '15px 0 15px 15px';
+        document.getElementById('prev-name').style.textAlign = left ? 'left' : 'right';
+    }
+
     function updateLivePreview() {
+        updateChatPositionPreview();
         const bubbleHex = document.getElementById('cfg-color-bubble').value;
         const opacity = Math.max(0, Math.min(100, Number(document.getElementById('cfg-bubble-opacity').value || 100)));
         const bubbleRgb = hexToRgb(bubbleHex) || {r:45, g:20, b:70};
@@ -1140,9 +1191,12 @@
     }
 
     document.querySelectorAll('input[type="color"]').forEach(el => el.addEventListener('input', updateLivePreview));
+    document.getElementById('cfg-position').addEventListener('change',updateChatPositionPreview);
+    document.getElementById('cfg-richtung').addEventListener('change',updateChatPositionPreview);
     document.getElementById('cfg-bubble-opacity').addEventListener('input', updateLivePreview);
     document.getElementById('cfg-firework-volume').addEventListener('input', updateLivePreview);
     updateLivePreview();
+    updateAffiliateVisibility();
 
     function clampNumber(value, min, max, fallback) {
         const n = Number(value);
@@ -1174,6 +1228,8 @@
 
         const dauer = Math.max(0, Math.round(clampNumber(document.getElementById('cfg-dauer').value, 0, 86400, 45)));
         const richtung = document.getElementById('cfg-richtung').value === "2" ? 2 : 1;
+        const position = document.getElementById('cfg-position').value === 'left' ? 'left' : 'right';
+        const affiliateEnabled = document.getElementById('cfg-affiliate').checked;
         const twitch = document.getElementById('cfg-twitch').checked ? 1 : 0;
         const youtube = document.getElementById('cfg-youtube').checked ? 1 : 0;
 
@@ -1212,13 +1268,14 @@
         templateText = removeOrKeepDebugBlocks(templateText, diagnostics);
 
         const map = {
-            '[[OVERLAY_VERSION]]': '1.1.1',
+            '[[OVERLAY_VERSION]]': '1.1.2',
             '[[WS_IP]]': js(wsIp),
             '[[WS_PORT]]': js(wsPort),
             '[[SYS_NAME]]': js(sysName),
             '[[SYS_ACCOUNT]]': js(sysAccount),
             '[[DAUER]]': String(dauer),
             '[[RICHTUNG]]': String(richtung),
+            '[[POSITION_CHATBLASE]]': js(position),
             '[[ZEIGE_TWITCH]]': String(twitch),
             '[[ZEIGE_YOUTUBE]]': String(youtube),
             '[[HAUPT_MODS]]': js(modsArray),
@@ -1241,8 +1298,8 @@
             '[[MOD_HEX]]': modHex,
             '[[VIP_RGBA]]': `rgba(${vipRgb.r}, ${vipRgb.g}, ${vipRgb.b}, 0.15)`,
             '[[MOD_RGBA]]': `rgba(${modRgb.r}, ${modRgb.g}, ${modRgb.b}, 0.2)`,
-            '[[ZEIGE_KANALPUNKTE]]': document.getElementById('cfg-channel-points').checked ? '1' : '0',
-            '[[ZEIGE_ZUSCHAUERSERIEN]]': document.getElementById('cfg-watch-streaks').checked ? '1' : '0',
+            '[[ZEIGE_KANALPUNKTE]]': affiliateEnabled && document.getElementById('cfg-channel-points').checked ? '1' : '0',
+            '[[ZEIGE_ZUSCHAUERSERIEN]]': affiliateEnabled && document.getElementById('cfg-watch-streaks').checked ? '1' : '0',
             '[[KANALPUNKTE_WAEHRUNG]]': js(document.getElementById('cfg-currency').value.trim() || 'Kanalpunkte'),
             '[[ZEIGE_KANALPUNKTE_BILD]]': document.getElementById('cfg-coin-gif').checked ? '1' : '0',
             '[[KANALPUNKTE_BILD_DATEI]]': js(document.getElementById('cfg-coin-gif-file').value.trim() || 'Kanalpunkte.gif'),
@@ -1276,12 +1333,8 @@
 <script id="overlay-template" type="text/plain">
 <!DOCTYPE html>
 <!--
-    einfachNat Chat Overlay
-    Overlay-Version: [[OVERLAY_VERSION]]
-    Erstellt mit dem einfachNat Chat Overlay Generator
     https://einfachnat.ch/chat-overlay
-
-    Keine versteckten Tracking- oder Telemetrieanfragen.
+    einfachNat Chat Overlay-Version: [[OVERLAY_VERSION]]
 -->
 <html lang="de">
 <head>
@@ -1295,7 +1348,9 @@
            ========================================== */
         :root {
             --font-main: 'Kanit', sans-serif;
-            --avatar-side: row; 
+            --avatar-side: row;
+            --slide-x: 56px;
+            --fade-x: -28px;
             --direction: column; 
             --mask-fade: linear-gradient(to bottom, transparent 0%, black 10%, black 100%);
         }
@@ -1309,13 +1364,22 @@
 
         #chat-container { display: flex; flex-direction: var(--direction); gap: 21px; width: 100%; }
 
+        /* Position und Laufrichtung sind unabhängig. Standard rechts bleibt identisch. */
+        .position-left { --avatar-side: row-reverse; --slide-x: -56px; --fade-x: 28px; }
+        .position-left .message-wrapper { justify-content: flex-end; }
+        .position-left .message-content { align-items: flex-start; }
+        .position-left .username { text-align: left; }
+        .position-left .bubble { border-radius: 0 21px 21px 21px; }
+        .position-left .platform-icon { right:auto; left:-3px; }
+        .position-left .role-badge { right:auto; left:-5px; }
+
         /* ==========================================
            NACHRICHTEN & CHATBLASEN
            ========================================== */
         .message-wrapper {
             display: flex; flex-direction: var(--avatar-side); align-items: flex-start;
             justify-content: flex-end; margin-bottom: 0px; max-height: 0; opacity: 0;
-            transform: translateX(56px); 
+            transform: translateX(var(--slide-x)); 
             transition: max-height 0.2s ease-out, opacity 0.3s ease-out 0.05s, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.05s;
             overflow: visible; max-width: 100%; 
         }
@@ -1383,7 +1447,7 @@
            LÖSCH- UND FADE-ANIMATIONEN
            ========================================== */
         .fade-out {
-            opacity: 0 !important; transform: scale(0.9) translateX(-28px) !important; 
+            opacity: 0 !important; transform: scale(0.9) translateX(var(--fade-x)) !important; 
             max-height: 0 !important; margin-bottom: 0 !important; transition: all 0.5s ease-out !important;
         }
         
@@ -1645,6 +1709,8 @@
         // 2 = neue Nachrichten erscheinen OBEN; ältere Nachrichten wandern nach UNTEN.
         // Die horizontale Ausrichtung (aktuell rechts) wird separat über das CSS gesteuert.
         const RICHTUNG = [[RICHTUNG]];
+        // Links oder rechts, unabhängig von der Laufrichtung.
+        const POSITION_CHATBLASE = [[POSITION_CHATBLASE]];
 
         // Plattformen ein-/ausblenden: 1 = anzeigen, 0 = ausblenden.
         const ZEIGE_TWITCH = [[ZEIGE_TWITCH]];
@@ -1780,6 +1846,8 @@
         // ==========================================
         //               ENDE STEUERZENTRALE
         // ==========================================
+
+        document.documentElement.classList.toggle('position-left', POSITION_CHATBLASE === 'left');
 
         if (RICHTUNG === 2) { 
             document.documentElement.style.setProperty('--direction', 'column-reverse'); 

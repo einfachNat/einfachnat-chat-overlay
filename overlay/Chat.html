@@ -1,17 +1,13 @@
 
 <!DOCTYPE html>
 <!--
-    einfachNat Chat Overlay
-    Overlay-Version: 1.1.1
-    Erstellt mit dem einfachNat Chat Overlay Generator
     https://einfachnat.ch/chat-overlay
-
-    Keine versteckten Tracking- oder Telemetrieanfragen.
+    einfachNat Chat Overlay-Version: 1.1.2
 -->
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="generator" content="einfachNat Chat Overlay Generator 1.1.1">
+    <meta name="generator" content="einfachNat Chat Overlay Generator 1.1.2">
     <meta name="author" content="einfachNat">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;500&display=swap" rel="stylesheet">
     <style>
@@ -20,7 +16,9 @@
            ========================================== */
         :root {
             --font-main: 'Kanit', sans-serif;
-            --avatar-side: row; 
+            --avatar-side: row;
+            --slide-x: 56px;
+            --fade-x: -28px;
             --direction: column; 
             --mask-fade: linear-gradient(to bottom, transparent 0%, black 10%, black 100%);
         }
@@ -34,13 +32,22 @@
 
         #chat-container { display: flex; flex-direction: var(--direction); gap: 21px; width: 100%; }
 
+        /* Position und Laufrichtung sind unabhängig. Standard rechts bleibt identisch. */
+        .position-left { --avatar-side: row-reverse; --slide-x: -56px; --fade-x: 28px; }
+        .position-left .message-wrapper { justify-content: flex-end; }
+        .position-left .message-content { align-items: flex-start; }
+        .position-left .username { text-align: left; }
+        .position-left .bubble { border-radius: 0 21px 21px 21px; }
+        .position-left .platform-icon { right:auto; left:-3px; }
+        .position-left .role-badge { right:auto; left:-5px; }
+
         /* ==========================================
            NACHRICHTEN & CHATBLASEN
            ========================================== */
         .message-wrapper {
             display: flex; flex-direction: var(--avatar-side); align-items: flex-start;
             justify-content: flex-end; margin-bottom: 0px; max-height: 0; opacity: 0;
-            transform: translateX(56px); 
+            transform: translateX(var(--slide-x)); 
             transition: max-height 0.2s ease-out, opacity 0.3s ease-out 0.05s, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.05s;
             overflow: visible; max-width: 100%; 
         }
@@ -108,7 +115,7 @@
            LÖSCH- UND FADE-ANIMATIONEN
            ========================================== */
         .fade-out {
-            opacity: 0 !important; transform: scale(0.9) translateX(-28px) !important; 
+            opacity: 0 !important; transform: scale(0.9) translateX(var(--fade-x)) !important; 
             max-height: 0 !important; margin-bottom: 0 !important; transition: all 0.5s ease-out !important;
         }
         
@@ -235,9 +242,9 @@
         
 
     </style>
-<script id="einfachnat-overlay-config" type="application/json">{"schemaVersion":1,"overlayVersion":"1.1.1","settings":{"ws-ip":"127.0.0.1","ws-port":"8080","sys-name":"einfachNat","sys-account":"einfachnat","dauer":"45","richtung":"1","twitch":true,"youtube":true,"channel-points":true,"currency":"Kanalpunkte","coin-gif-file":"Kanalpunkte.gif","coin-gif":true,"watch-streaks":true,"streak-coins":true,"fireworks":true,"firework-sound":true,"firework-volume":"22","color-name":"#ffffff","color-text":"#ffffff","color-bubble":"#2d1446","bubble-opacity":"100","hauptmods":"","icon-broadcaster":"isBroadcaster.png","icon-hauptmod":"isMainmod.png","icon-mod":"isMod.png","icon-vip":"isVip.png","glitter":true,"color-vip":"#c864ff","color-mod":"#87cefa","cmd-name":"!namefarbe","cmd-bubble":"!bubblefarbe","cmd-text":"!textfarbe","cmd-reset":"!farbenreset","cmd-sniper":"!del","hide-color-cmds":true,"hidden-cmds":"!lurk, !discord, !socials","diagnostics":false},"texts":{"KANALPUNKTE_TEXTE":["{user} löst «{reward}» für {cost} {currency} ein!","{user} hat «{reward}» für {cost} {currency} eingelöst."],"KANALPUNKTE_INPUT_TEXTE":["{user}: «{input}»","Nachricht von {user}: «{input}»"],"AUTOMATISCHE_REWARD_TEXTE":["{user} schaltet «{reward}» für {cost} {currency} frei!"],"SERIE_KLEIN":["{user} ist {streak} Streams in Folge dabei!","{streak} Streams in Folge für {user}!"],"SERIE_MITTEL":["{user} erreicht {streak} Streams in Folge!"],"SERIE_GROSS":["{user} ist bei {streak} Streams in Folge dabei!"],"SERIE_EXTREM":["{streak} Streams hintereinander – danke, {user}!"],"SERIE_LEGENDAER":["{user} erreicht eine Serie von {streak} Streams!"],"SERIE_MEILENSTEINE":{"5":["5 Streams in Folge! Glückwunsch, {user}!"],"10":["10 Streams in Folge! Glückwunsch, {user}!"],"25":["25 Streams in Folge! Glückwunsch, {user}!"],"50":["50 Streams in Folge! Glückwunsch, {user}!"],"100":["100 Streams in Folge! Glückwunsch, {user}!"]},"SERIE_COIN_TEXTE":["{user} erhält {coins} {currency} für die Serie."],"SERIE_INPUT_TEXTE":["{user}: «{input}»"]}}</script>
+<script id="einfachnat-overlay-config" type="application/json">{"schemaVersion":1,"overlayVersion":"1.1.2","settings":{"ws-ip":"127.0.0.1","ws-port":"8080","sys-name":"Schnuffi","sys-account":"schnuffibuddy","dauer":"45","richtung":"1","position":"right","twitch":true,"youtube":true,"affiliate":false,"channel-points":true,"currency":"Kanalpunkte","coin-gif-file":"Kanalpunkte.gif","coin-gif":true,"watch-streaks":true,"streak-coins":true,"fireworks":true,"firework-sound":true,"firework-volume":"22","color-name":"#ffffff","color-text":"#ffffff","color-bubble":"#2d1446","bubble-opacity":"100","hauptmods":"2andgame2","icon-broadcaster":"isBroadcaster.png","icon-hauptmod":"isMainmod.png","icon-mod":"isMod.png","icon-vip":"isVip.png","glitter":true,"color-vip":"#c864ff","color-mod":"#87cefa","cmd-name":"!namefarbe","cmd-bubble":"!bubblefarbe","cmd-text":"!textfarbe","cmd-reset":"!farbenreset","cmd-sniper":"!del","hide-color-cmds":false,"hidden-cmds":"!namefarbe, !bubblefarbe, !textfarbe, !farbenreset, !lurk, !discord, !socials","diagnostics":false},"texts":{"KANALPUNKTE_TEXTE":["{user} löst «{reward}» für {cost} {currency} ein!","{user} hat «{reward}» für {cost} {currency} eingelöst."],"KANALPUNKTE_INPUT_TEXTE":["{user}: «{input}»","Nachricht von {user}: «{input}»"],"AUTOMATISCHE_REWARD_TEXTE":["{user} schaltet «{reward}» für {cost} {currency} frei!"],"SERIE_KLEIN":["{user} ist {streak} Streams in Folge dabei!","{streak} Streams in Folge für {user}!"],"SERIE_MITTEL":["{user} erreicht {streak} Streams in Folge!"],"SERIE_GROSS":["{user} ist bei {streak} Streams in Folge dabei!"],"SERIE_EXTREM":["{streak} Streams hintereinander – danke, {user}!"],"SERIE_LEGENDAER":["{user} erreicht eine Serie von {streak} Streams!"],"SERIE_MEILENSTEINE":{"5":["5 Streams in Folge! Glückwunsch, {user}!"],"10":["10 Streams in Folge! Glückwunsch, {user}!"],"25":["25 Streams in Folge! Glückwunsch, {user}!"],"50":["50 Streams in Folge! Glückwunsch, {user}!"],"100":["100 Streams in Folge! Glückwunsch, {user}!"]},"SERIE_COIN_TEXTE":["{user} erhält {coins} {currency} für die Serie."],"SERIE_INPUT_TEXTE":["{user}: «{input}»"]}}</script>
 </head>
-<body data-overlay-generator="einfachNat" data-overlay-version="1.1.1">
+<body data-overlay-generator="einfachNat" data-overlay-version="1.1.2">
     <canvas id="fireworks-layer"></canvas>
     <div id="chat-container"></div>
     <script>
@@ -246,7 +253,7 @@
         // ==========================================
         const OVERLAY_INFO = Object.freeze({
             generator: "einfachNat Chat Overlay Generator",
-            version: "1.1.1",
+            version: "1.1.2",
             source: "https://einfachnat.ch/chat-overlay"
         });
         console.info(`%ceinfachNat Chat Overlay ${OVERLAY_INFO.version}`, "color:#b985f5;font-weight:bold");
@@ -267,16 +274,18 @@
         // 2 = neue Nachrichten erscheinen OBEN; ältere Nachrichten wandern nach UNTEN.
         // Die horizontale Ausrichtung (aktuell rechts) wird separat über das CSS gesteuert.
         const RICHTUNG = 1;
+        // Links oder rechts, unabhängig von der Laufrichtung.
+        const POSITION_CHATBLASE = "right";
 
         // Plattformen ein-/ausblenden: 1 = anzeigen, 0 = ausblenden.
         const ZEIGE_TWITCH = 1;
         const ZEIGE_YOUTUBE = 1; 
         
-        const HAUPT_MODS = []; 
+        const HAUPT_MODS = ["2andgame2"]; 
 
         // --- SYSTEM-ACCOUNT ---
-        const SYSTEM_NAME = "einfachNat";
-        const SYSTEM_TWITCH_LOGIN = "einfachnat";
+        const SYSTEM_NAME = "Schnuffi";
+        const SYSTEM_TWITCH_LOGIN = "schnuffibuddy";
 
         // --- CHATBEFEHLE ---
         const CMD_NAME = "!namefarbe"; 
@@ -287,7 +296,7 @@
         // Erweiterter Sniper-Befehl (Beispiele: !del @user, !del user 4, !del 4)
         const CMD_SNIPER = "!del"; 
 
-        const VERSTECKTE_BEFEHLE = ["!lurk","!discord","!socials","!namefarbe","!bubblefarbe","!textfarbe","!farbenreset"]; 
+        const VERSTECKTE_BEFEHLE = ["!namefarbe","!bubblefarbe","!textfarbe","!farbenreset","!lurk","!discord","!socials"]; 
         
         const ENABLE_GLITTER = true;
 
@@ -311,8 +320,8 @@
         //      AFFILIATE-FEATURES / EVENTS
         // ==========================================
         // 1 = an, 0 = aus
-        const ZEIGE_KANALPUNKTE = 1;
-        const ZEIGE_ZUSCHAUERSERIEN = 1;
+        const ZEIGE_KANALPUNKTE = 0;
+        const ZEIGE_ZUSCHAUERSERIEN = 0;
 
         // Angezeigter Name deiner Kanalpunkte.
         // In SYSTEM-Nachrichten wird {currency} automatisch mit Regenbogeneffekt dargestellt.
@@ -391,6 +400,8 @@
         // ==========================================
         //               ENDE STEUERZENTRALE
         // ==========================================
+
+        document.documentElement.classList.toggle('position-left', POSITION_CHATBLASE === 'left');
 
         if (RICHTUNG === 2) { 
             document.documentElement.style.setProperty('--direction', 'column-reverse'); 
